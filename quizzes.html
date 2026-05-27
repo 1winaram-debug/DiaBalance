@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ինտերակտիվ Քվիզներ — DiaBalance</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --surface-light: #f0f1f5;
+            --blue: #1a3c6e;
+            --teal: #0cbfb0;
+            --teal-soft: rgba(12,191,176,0.15);
+            --white: #1e2235;
+            --gray: #8a91a8;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: #e2e4ed;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Noto Sans Armenian', 'DM Sans', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        
+        body::after { content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); background-repeat:repeat; background-size:200px; opacity:0.6; }
+
+        /* Navbar */
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; background: var(--glass-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(26, 60, 110, .06); }
+        .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; color: var(--blue); text-decoration: none; letter-spacing: 0.05em; }
+        .logo span { color: var(--teal); }
+        
+        .nav-back-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1.4rem; background: var(--teal-soft); color: var(--blue); border: 1px solid rgba(12,191,176,0.25); border-radius: 100px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-back-btn:hover { background: var(--teal); color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(12,191,176,0.3); }
+
+        /* Main Container */
+        .main { flex: 1; padding: 8rem 2rem 4rem; max-width: 1000px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2rem; width: 100%; box-shadow: 0 8px 32px rgba(26, 60, 110, .06); }
+
+        /* Welcome Screen */
+        .welcome-screen { text-align: center; width: 100%; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(12,191,176,0.1); color: var(--teal); padding: 6px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.6rem; border: 1px solid rgba(12,191,176,0.2); }
+        .page-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; margin: 0 0 1rem; color: var(--blue); }
+        .page-title span { color: var(--teal); }
+        .page-sub { color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto 3rem; line-height: 1.6; }
+
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; width: 100%; }
+        .quiz-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.8rem; cursor: pointer; text-align: left; transition: all 0.3s; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(26, 60, 110, .04); }
+        .quiz-card:hover { border-color: var(--teal); transform: translateY(-4px); box-shadow: 0 15px 40px rgba(12,191,176,0.15); }
+        .quiz-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.2rem; transition: all 0.3s; border: 1px solid rgba(12,191,176,0.2); }
+        .quiz-card:hover .quiz-icon { background: var(--teal); color: #ffffff; }
+        .quiz-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--blue); }
+        .quiz-desc { color: var(--gray); font-size: 0.9rem; line-height: 1.5; margin: 0 0 1.5rem; flex: 1; }
+        .quiz-start { color: var(--teal); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .quiz-card:hover .quiz-start i { transform: translateX(4px); }
+
+        /* Question Screen */
+        .question-screen { width: 100%; max-width: 800px; display: none; }
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .q-title { font-size: 1.5rem; font-weight: 700; color: var(--teal); margin: 0; }
+        .q-progress { background: var(--surface); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 100px; color: var(--gray); font-weight: 600; font-size: 0.9rem; }
+        
+        .question-box { padding: 2.5rem; }
+        .question-text { font-size: 1.3rem; font-weight: 600; margin: 0 0 2rem; line-height: 1.5; color: var(--blue); }
+        
+        .options-list { display: flex; flex-direction: column; gap: 1rem; }
+        .option-btn { background: var(--surface); border: 1px solid var(--glass-border); color: var(--white); padding: 1.2rem 1.5rem; border-radius: 14px; font-size: 1.05rem; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; font-family: inherit; font-weight: 500; }
+        .option-btn:hover { border-color: var(--teal); background: var(--teal-soft); color: var(--blue); }
+        .option-btn i { color: var(--teal); opacity: 0; transition: opacity 0.2s; }
+        .option-btn:hover i { opacity: 1; transform: translateX(4px); }
+        
+        .back-to-menu { text-align: center; margin-top: 2rem; }
+        .back-to-menu button { background: none; border: none; color: var(--gray); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; font-size: 0.9rem; transition: color 0.2s; font-family: inherit; }
+        .back-to-menu button:hover { color: var(--blue); }
+
+        /* Result Screen */
+        .result-screen { width: 100%; max-width: 600px; text-align: center; display: none; margin-top: 2rem; }
+        .result-box { padding: 3rem; }
+        .result-icon { width: 100px; height: 100px; margin: 0 auto 1.5rem; background: var(--teal-soft); color: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; border: 1px solid rgba(12,191,176,0.2); }
+        .result-title { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--blue); }
+        .result-text { font-size: 1.1rem; color: var(--gray); margin: 0 0 2rem; }
+        
+        .progress-bar { width: 100%; height: 16px; background: var(--surface-light); border-radius: 100px; overflow: hidden; margin-bottom: 2rem; border: 1px solid var(--glass-border); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), #1dd1a1); width: 0%; transition: width 1s ease-out; }
+        
+        .primary-btn { background: var(--teal); color: #ffffff; border: none; padding: 1rem 2.5rem; border-radius: 100px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; box-shadow: 0 4px 15px rgba(12,191,176,0.3); }
+        .primary-btn:hover { background: #0aada0; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(12,191,176,0.4); }
+        
+        @media (max-width: 640px) {
+            .nav-bar { padding: 1rem 1.5rem; }
+            .main { padding-top: 6rem; }
+            .question-box { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <a href="index.html" class="nav-back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ
+        </a>
+    </nav>
+
+    <main class="main">
+        <!-- SCREEN: Welcome Selection -->
+        <div class="welcome-screen" id="screen-welcome">
+            <div class="badge"><i class="fa-solid fa-graduation-cap"></i> Գիտելիքի Ստուգում</div>
+            <h1 class="page-title">Ինտերակտիվ <span>Քվիզներ</span></h1>
+            <p class="page-sub">Ընտրեք թեման և ստուգեք ձեր գիտելիքները դիաբետի, կենսաբանության և առողջ ապրելակերպի վերաբերյալ:</p>
+            <div class="quiz-grid" id="quiz-grid">
+                <!-- Quizzes injected here via JS -->
+            </div>
+        </div>
+
+        <!-- SCREEN: Questions -->
+        <div class="question-screen" id="screen-question">
+            <div class="q-header">
+                <h2 class="q-title" id="q-category-title">Թեմա</h2>
+                <span class="q-progress" id="q-progress-text">Հարց 1 / 5</span>
+            </div>
+            <div class="glass-card question-box">
+                <h3 class="question-text" id="q-text">Հարցի տեքստը կհայտնվի այստեղ</h3>
+                <div class="options-list" id="q-options">
+                    <!-- Options injected via JS -->
+                </div>
+            </div>
+            <div class="back-to-menu">
+                <button onclick="resetApp()">Ընդհատել և վերադառնալ ընտրացանկ</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: Results -->
+        <div class="result-screen" id="screen-result">
+            <div class="glass-card result-box">
+                <div class="result-icon" id="r-icon"><i class="fa-solid fa-star"></i></div>
+                <h2 class="result-title">Արդյունքներ</h2>
+                <p class="result-text" id="r-text">Դուք ճիշտ պատասխանեցիք X հարցի Y-ից:</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="r-progress"></div>
+                </div>
+                <button class="primary-btn" onclick="resetApp()">Ընտրել այլ քվիզ</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const QUIZZES = [
+            {
+                id: 1, title: "Դիաբետի Հիմունքներ", icon: "fa-solid fa-notes-medical",
+                description: "Ստուգեք ձեր գիտելիքները դիաբետի տեսակների և նախանշանների մասին:",
+                questions: [
+                    { q: "Ո՞րն է 1-ին տիպի դիաբետի հիմնական պատճառը:", options: ["Ճարպակալումը", "Աուտոիմուն ռեակցիան", "Շատ քաղցրավենիք ուտելը", "Սթրեսը"], answer: 1 },
+                    { q: "Ի՞նչ է ինսուլինը:", options: ["Վիտամին", "Արյան բջիջ", "Հորմոն, որն իջեցնում է շաքարը", "Հակաբիոտիկ"], answer: 2 },
+                    { q: "Ո՞ր տարիքում է առավել հաճախ ի հայտ գալիս 2-րդ տիպի դիաբետը:", options: ["Մանկական հասակում", "40-ից բարձր", "Միայն տարեցների մոտ", "Անկախ տարիքից"], answer: 1 },
+                    { q: "Ինչպե՞ս է կոչվում հղիության ընթացքում առաջացող դիաբետը:", options: ["Գեստացիոն", "Ժամանակավոր", "Տիպ 3", "Հորմոնալ"], answer: 0 },
+                    { q: "Ո՞րն է արյան շաքարի նորմալ մակարդակը քաղցած ժամանակ (մմոլ/լ):", options: ["2.0 - 3.5", "4.0 - 5.9", "7.0 - 8.5", "8.5 - 10.0"], answer: 1 },
+                    { q: "Ո՞ր տիպի դիաբետն է կոչվում «ինսուլինակախյալ»:", options: ["Տիպ 2", "Գեստացիոն", "Տիպ 1", "Լատենտ"], answer: 2 },
+                    { q: "Կարո՞ղ է արդյոք դիաբետը լիովին բուժվել:", options: ["Այո, դեղահաբերով", "Ոչ, բայց այն կարելի է կառավարել", "Այո, դիետայի միջոցով", "Այո, ինսուլինով"], answer: 1 },
+                    { q: "Նշվածներից ո՞րը դիաբետի ախտանիշ ՉԷ:", options: ["Մազաթափություն", "Ուժեղ ծարավ", "Հաճախակի միզարձակում", "Քաշի անբացատրելի կորուստ"], answer: 0 },
+                    { q: "Ի՞նչ է նշանակում HbA1c (գլիկոզիլացված հեմոգլոբին) տերմինը:", options: ["Վերջին 3 ամսվա միջին շաքարը", "Վերջին 3 օրվա շաքարը", "Ինսուլինի քանակը", "Խոլեստերինը"], answer: 0 },
+                    { q: "Ո՞րն է դիաբետի ժամանակ ամենավտանգավոր սուր բարդությունը:", options: ["Գլխացավ", "Ոտնաթաթի ցավ", "Հիպոգլիկեմիկ կոմա", "Հոգնածություն"], answer: 2 },
+                ]
+            },
+            {
+                id: 2, title: "Կենսաբանություն և Օրգանիզմ", icon: "fa-solid fa-dna",
+                description: "Ինչպե՞ս է օրգանիզմը մշակում ածխաջրերը և գլյուկոզան:",
+                questions: [
+                    { q: "Ո՞ր օրգանն է արտադրում ինսուլին:", options: ["Լյարդը", "Երիկամները", "Ենթաստամոքսային գեղձը", "Ստամոքսը"], answer: 2 },
+                    { q: "Ի՞նչ է տեղի ունենում ինսուլինառեզիստենտության դեպքում:", options: ["Ինսուլին չի արտադրվում", "Բջիջները չեն արձագանքում ինսուլինին", "Արյան շաքարը իջնում է", "Ենթաստամոքսային գեղձը դադարում է աշխատել"], answer: 1 },
+                    { q: "Որտե՞ղ է պահվում գլյուկոզայի ավելցուկը (որպես գլիկոգեն):", options: ["Լյարդում և մկաններում", "Ոսկորներում", "Արյան մեջ", "Ուղեղում"], answer: 0 },
+                    { q: "Ի՞նչ դեր ունեն բետա-բջիջները:", options: ["Արտադրում են հակամարմիններ", "Արտադրում են ինսուլին", "Քայքայում են շաքարը", "Պաշտպանում են վիրուսներից"], answer: 1 },
+                    { q: "Ի՞նչ է գլյուկոզան:", options: ["Սպիտակուց", "Ճարպ", "Պարզ ածխաջուր (շաքար)", "Ֆերմենտ"], answer: 2 },
+                    { q: "Ի՞նչ դեր ունի գլյուկագոն հորմոնը:", options: ["Բարձրացնում է արյան շաքարը", "Իջեցնում է արյան շաքարը", "Քայքայում է ճարպերը", "Կարգավորում է ճնշումը"], answer: 0 },
+                    { q: "Ենթաստամոքսային գեղձի ո՞ր հատվածն է արտադրում հորմոններ:", options: ["Ծայրամասային հյուսվածքներ", "Լանգերհանսյան կղզյակներ", "Լեղապարկ", "Աղիներ"], answer: 1 },
+                    { q: "Արյան միջոցով թթվածինը ո՞ր բջիջներն են տեղափոխում:", options: ["Լեյկոցիտներ", "Թրոմբոցիտներ", "Էրիթրոցիտներ", "Նեյրոններ"], answer: 2 },
+                    { q: "Ինչպե՞ս է կոչվում օրգանիզմում նյութափոխանակության պրոցեսը:", options: ["Անաբոլիզմ", "Մետաբոլիզմ", "Կատաբոլիզմ", "Ֆագոցիտոզ"], answer: 1 },
+                    { q: "Ո՞ր օրգանն է մաքրում արյունը տոքսիններից և ավելցուկային գլյուկոզայից:", options: ["Սիրտը", "Թոքերը", "Երիկամները", "Փայծաղը"], answer: 2 },
+                ]
+            },
+            {
+                id: 3, title: "Սնուցում և Դիետա", icon: "fa-solid fa-apple-whole",
+                description: "Ստուգեք, թե որքան լավ եք ճանաչում օգտակար մթերքները:",
+                questions: [
+                    { q: "Ո՞ր մթերքն ունի ամենացածր գլիկեմիկ ինդեքսը:", options: ["Սպիտակ հաց", "Բրոկոլի", "Կարտոֆիլ", "Սեխ"], answer: 1 },
+                    { q: "Ի՞նչ է Հացային Միավորը (XE):", options: ["10-12 գրամ ածխաջուր պարունակող չափաբաժին", "Կալորիաների հաշվարկման մեթոդ", "Հացի քաշը", "Ինսուլինի դոզա"], answer: 0 },
+                    { q: "Ո՞ր ըմպելիքն է ամենաանվտանգը դիաբետիկի համար:", options: ["Մրգահյութ", "Գազավորված ըմպելիք", "Մաքուր ջուր", "Կվաս"], answer: 2 },
+                    { q: "Ի՞նչ դեր ունի բջջանքը (կլետչատկա) սննդակարգում:", options: ["Բարձրացնում է շաքարը", "Դանդաղեցնում է ածխաջրերի ներծծումը", "Փոխարինում է ինսուլինին", "Ավելացնում է կալորիաներ"], answer: 1 },
+                    { q: "Ո՞ր մթերքից պետք է խուսափել:", options: ["Տրանս ճարպեր (արագ սնունդ)", "Ընկուզեղեն", "Ձկնեղեն", "Կանաչեղեն"], answer: 0 },
+                    { q: "Ո՞ր մթերքն Է պարունակում բարդ ածխաջրեր:", options: ["Շոկոլադ", "Հնդկաձավար (Գրեչկա)", "Մեղր", "Պաղպաղակ"], answer: 1 },
+                    { q: "Նշվածներից ո՞րն է համարվում «արագ» ածխաջուր:", options: ["Մեղր", "Վարսակ", "Լոբի", "Ընկույզ"], answer: 0 },
+                    { q: "Ի՞նչ են օմեգա-3 ճարպաթթուները:", options: ["Վնասակար ճարպեր", "Օգտակար ճարպեր, որոնք պաշտպանում են սիրտը", "Ածխաջրերի տեսակ", "Արհեստական հավելումներ"], answer: 1 },
+                    { q: "Ո՞ր մթերքն է հարուստ սպիտակուցով:", options: ["Խնձոր", "Բրինձ", "Ձու", "Գազար"], answer: 2 },
+                    { q: "Կարո՞ղ են դիաբետիկները ուտել մրգեր:", options: ["Ոչ, երբեք", "Այո, անսահմանափակ", "Այո, բայց չափավոր և հաշվարկելով", "Միայն չորացրած մրգեր"], answer: 2 },
+                    { q: "Քանի՞ կալորիա է պարունակում 1 գրամ ճարպը:", options: ["4 կկալ", "7 կկալ", "9 կկալ", "12 կկալ"], answer: 2 },
+                ]
+            },
+            {
+                id: 4, title: "Ապրելակերպ և Սպորտ", icon: "fa-solid fa-person-running",
+                description: "Ինչպե՞ս է ֆիզիկական ակտիվությունն ազդում դիաբետի վրա:",
+                questions: [
+                    { q: "Ինչպե՞ս է ազդում ֆիզիկական ակտիվությունը արյան շաքարի վրա:", options: ["Բարձրացնում է", "Նվազեցնում է", "Չի ազդում", "Դարձնում է անկայուն"], answer: 1 },
+                    { q: "Ո՞ր մարզաձևն է ամենանախընտրելին սկսնակների համար:", options: ["Ծանրամարտ", "Արագավազք", "Քայլք և լող", "Բռնցքամարտ"], answer: 2 },
+                    { q: "Ի՞նչ է պետք անել մարզումից առաջ, եթե շաքարը շատ ցածր է:", options: ["Սկսել մարզումը", "Ուտել ածխաջրեր (օր՝ բանան)", "Խմել շատ ջուր", "Ներարկել ինսուլին"], answer: 1 },
+                    { q: "Ինչպե՞ս է քրոնիկ սթրեսն ազդում դիաբետի վրա:", options: ["Իջեցնում է շաքարը", "Բարձրացնում է կորտիզոլը և շաքարը", "Բուժում է դիաբետը", "Լավացնում է քունը"], answer: 1 },
+                    { q: "Որքա՞ն պետք է տևի առողջ քունը:", options: ["4-5 ժամ", "7-8 ժամ", "10-12 ժամ", "Կապ չունի"], answer: 1 },
+                    { q: "Ի՞նչ է խորհուրդ տրվում կրել մարզվելիս ոտքերը պաշտպանելու համար:", options: ["Բոբիկ մարզվել", "Հատուկ և հարմարավետ մարզակոշիկներ", "Նեղ կոշիկներ", "Ռետինե հողաթափեր"], answer: 1 },
+                    { q: "Մարզման ընթացքում ի՞նչ պետք է միշտ ունենալ ձեռքի տակ:", options: ["Աղի սնունդ", "Արագ ածխաջուր՝ քաղցրավենիք կամ հյութ", "Սուրճ", "Ծանրաձող"], answer: 1 },
+                    { q: "Եթե արյան շաքարը 15 մմոլ/լ է, կարելի՞ է արդյոք ինտենսիվ մարզվել:", options: ["Այո, առանց խնդրի", "Միայն դատարկ ստամոքսին", "Ոչ, վտանգավոր է", "Միայն ծանրություններ բարձրացնել"], answer: 2 },
+                    { q: "Ալկոհոլի օգտագործումը ինչպե՞ս է ազդում դիաբետի վրա:", options: ["Բուժում է այն", "Չի ազդում", "Կարող է առաջացնել հանկարծակի հիպոգլիկեմիա", "Միայն բարձրացնում է շաքարը"], answer: 2 },
+                    { q: "Ծխելը դիաբետով հիվանդների մոտ ինչի՞ ռիսկն է կրկնապատկում:", options: ["Մրսածության", "Սրտանոթային հիվանդությունների", "Տեսողության լավացման", "Գիրացման"], answer: 1 },
+                ]
+            }
+        ];
+
+        // State variables
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // DOM elements
+        const screenWelcome = document.getElementById("screen-welcome");
+        const screenQuestion = document.getElementById("screen-question");
+        const screenResult = document.getElementById("screen-result");
+        const quizGrid = document.getElementById("quiz-grid");
+        
+        // Render initial quiz grid
+        function initApp() {
+            quizGrid.innerHTML = "";
+            QUIZZES.forEach((quiz, index) => {
+                const card = document.createElement("div");
+                card.className = "quiz-card";
+                card.onclick = () => startQuiz(index);
+                card.innerHTML = `
+                    <div class="quiz-icon"><i class="${quiz.icon}"></i></div>
+                    <h3 class="quiz-title">${quiz.title}</h3>
+                    <p class="quiz-desc">${quiz.description}</p>
+                    <div class="quiz-start">Սկսել քվիզը <i class="fa-solid fa-arrow-right"></i></div>
+                `;
+                quizGrid.appendChild(card);
+            });
+        }
+
+        function startQuiz(index) {
+            currentQuiz = QUIZZES[index];
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.getElementById("q-category-title").textContent = currentQuiz.title;
+            
+            screenWelcome.style.display = "none";
+            screenQuestion.style.display = "block";
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentQuiz.questions[currentQuestionIndex];
+            
+            document.getElementById("q-progress-text").textContent = `Հարց ${currentQuestionIndex + 1} / ${currentQuiz.questions.length}`;
+            document.getElementById("q-text").textContent = q.q;
+            
+            const optionsContainer = document.getElementById("q-options");
+            optionsContainer.innerHTML = "";
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.id = `opt-${idx}`;
+                btn.innerHTML = `<span>${opt}</span><i class="fa-solid fa-chevron-right"></i>`;
+                btn.onclick = () => handleAnswer(idx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedIndex) {
+            const q = currentQuiz.questions[currentQuestionIndex];
+            const isCorrect = (selectedIndex === q.answer);
+            
+            const selectedBtn = document.getElementById(`opt-${selectedIndex}`);
+            const correctBtn = document.getElementById(`opt-${q.answer}`);
+            
+            // Disable all buttons
+            document.querySelectorAll(".option-btn").forEach(btn => btn.style.pointerEvents = "none");
+            
+            if (isCorrect) {
+                score++;
+                selectedBtn.style.backgroundColor = "rgba(12, 191, 176, 0.15)";
+                selectedBtn.style.borderColor = "var(--teal)";
+                selectedBtn.style.color = "var(--teal)";
+                selectedBtn.querySelector("i").className = "fa-solid fa-check";
+                selectedBtn.querySelector("i").style.opacity = "1";
+            } else {
+                selectedBtn.style.backgroundColor = "rgba(224, 82, 82, 0.1)";
+                selectedBtn.style.borderColor = "#e05252";
+                selectedBtn.style.color = "#e05252";
+                selectedBtn.querySelector("i").className = "fa-solid fa-xmark";
+                selectedBtn.querySelector("i").style.opacity = "1";
+                
+                // Highlight correct
+                if(correctBtn) {
+                    correctBtn.style.backgroundColor = "rgba(12, 191, 176, 0.15)";
+                    correctBtn.style.borderColor = "var(--teal)";
+                    correctBtn.style.color = "var(--teal)";
+                    correctBtn.querySelector("i").className = "fa-solid fa-check";
+                    correctBtn.querySelector("i").style.opacity = "1";
+                }
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuiz.questions.length) {
+                    renderQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1200);
+        }
+
+        function showResult() {
+            screenQuestion.style.display = "none";
+            screenResult.style.display = "block";
+            
+            const total = currentQuiz.questions.length;
+            const incorrect = total - score;
+            
+            document.getElementById("r-text").innerHTML = `
+                <div style="font-size: 1.15rem; color: var(--blue); margin-bottom: 1rem;">
+                    Ճիշտ պատասխաններ՝ <strong style="color: var(--teal);">${score}</strong><br>
+                    Սխալ պատասխաններ՝ <strong style="color: #e05252;">${incorrect}</strong>
+                </div>
+                Դուք ճիշտ պատասխանեցիք հարցերի ${Math.round((score/total)*100)}%-ին:
+            `;
+            
+            const iconEl = document.getElementById("r-icon");
+            if (score === total) {
+                iconEl.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                iconEl.style.color = "#fde74c";
+                iconEl.style.background = "rgba(253,231,76,0.15)";
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-star"></i>';
+                iconEl.style.color = "var(--teal)";
+                iconEl.style.background = "var(--teal-soft)";
+            }
+            
+            // animate progress
+            setTimeout(() => {
+                const percentage = (score / total) * 100;
+                document.getElementById("r-progress").style.width = percentage + "%";
+            }, 100);
+        }
+
+        function resetApp() {
+            currentQuiz = null;
+            document.getElementById("r-progress").style.width = "0%";
+            screenQuestion.style.display = "none";
+            screenResult.style.display = "none";
+            screenWelcome.style.display = "block";
+        }
+
+        // Run
+        initApp();
+    </script>
+</body>
+</html>

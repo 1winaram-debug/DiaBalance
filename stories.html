@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Հաջողության Պատմություններ — DiaBalance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --blue: #1a3c6e;
+            --blue-mid: #2563b0;
+            --teal: #0cbfb0;
+            --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5;
+            --gray-200: #e2e4ed;
+            --gray-500: #8a91a8;
+            --gray-800: #1e2235;
+
+            --deep-blue: var(--bg);
+            --navy: var(--surface);
+            --mid-blue: var(--blue-mid);
+            --teal-glow: rgba(12, 191, 176, 0.25);
+            --teal-dim: rgba(12, 191, 176, 0.12);
+            --white: var(--gray-800);
+            --white-dim: var(--gray-500);
+            --glass-bg: var(--surface);
+            --glass-border: var(--gray-200);
+            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
+            --radius-lg: 26px;
+            --radius-md: 18px;
+            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html, body {
+            width:100%;
+            background: var(--bg);
+            font-family: 'Noto Sans Armenian','DM Sans',sans-serif;
+            color: var(--white);
+            scroll-behavior: smooth;
+        }
+        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        body::after {
+            content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            background-repeat:repeat; background-size:200px; opacity:0.6;
+        }
+        .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(245, 246, 250, 0.75) 100%); }
+
+        /* NAV */
+        nav {
+            position:fixed; top:0; left:0; right:0; z-index:50;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:1.1rem 3rem;
+            background:rgba(255, 255, 255, 0.95);
+            backdrop-filter:blur(16px);
+            border-bottom:1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        .logo { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:600; color:var(--blue); letter-spacing:0.05em; text-decoration:none; }
+        .logo span { color:var(--teal); }
+        
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.4rem;
+            background: var(--teal-soft);
+            color: var(--blue) !important;
+            border: 1px solid rgba(12, 191, 176, 0.25);
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--teal);
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
+        }
+
+        /* CONTENT */
+        .content-wrapper { position:relative; z-index:10; padding-top:80px; }
+        .wrap { max-width:1000px; margin:0 auto; padding:0 5%; }
+        .section-pad { padding:100px 0; }
+
+        /* PAGE HERO */
+        .page-hero {
+            min-height:60vh; display:flex; align-items:center; justify-content:center;
+            text-align:center; padding:120px 5% 80px;
+            background:transparent;
+        }
+        .page-hero-badge {
+            display:inline-flex; align-items:center; gap:0.6rem;
+            padding:0.5rem 1.2rem; border:1px solid rgba(91, 192, 235, 0.5);
+            border-radius:999px; background:rgba(91, 192, 235, 0.1);
+            font-size:0.8rem; font-weight:600; color:#2563b0;
+            margin-bottom:1.6rem; backdrop-filter:blur(8px);
+        }
+        .page-hero-badge span { width:8px; height:8px; border-radius:50%; background:#5bc0eb; box-shadow:0 0 10px #5bc0eb; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+        .page-title { font-size:clamp(2.8rem,6vw,5rem); font-weight:700; line-height:1.15; margin-bottom:1.5rem; color:var(--blue); }
+        .page-title span { color:#5bc0eb; text-shadow:0 0 30px rgba(91, 192, 235, 0.4); }
+        .page-subtitle { font-size:1.2rem; color:var(--white-dim); max-width:600px; margin:0 auto; line-height:1.8; }
+
+        /* STORY CARDS */
+        .story-card {
+            background:var(--glass-bg); backdrop-filter:blur(16px);
+            border:1px solid var(--glass-border); border-radius:var(--radius-lg);
+            box-shadow:var(--glass-shadow); transition:all var(--transition);
+            display:flex; overflow:hidden; margin-bottom:3rem;
+        }
+        .story-card:hover { transform:translateY(-5px); box-shadow:0 15px 40px rgba(91, 192, 235, 0.15); border-color:#5bc0eb; }
+        
+        .story-img-wrapper { width:40%; position:relative; }
+        .story-img { width:100%; height:100%; object-fit:cover; display:block; }
+        .story-badge { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.6); color:#fff; padding:6px 14px; border-radius:100px; font-size:0.8rem; font-weight:700; backdrop-filter:blur(4px); }
+        
+        .story-content { width:60%; padding:3rem; display:flex; flex-direction:column; justify-content:center; }
+        .story-quote { font-size:1.4rem; font-style:italic; font-family:'Cormorant Garamond',serif; color:var(--blue); line-height:1.5; margin-bottom:1.5rem; position:relative; z-index:1; }
+        .story-quote::before { content:'"'; position:absolute; top:-30px; left:-20px; font-size:5rem; color:var(--gray-200); z-index:-1; font-family:sans-serif; line-height:1; }
+        
+        .story-text { font-size:1rem; color:var(--gray-500); line-height:1.6; margin-bottom:2rem; }
+        .story-author { display:flex; align-items:center; gap:1rem; }
+        .author-avatar { width:50px; height:50px; border-radius:50%; background:var(--teal-soft); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:1.2rem; }
+        .author-info h4 { font-size:1.1rem; color:var(--blue); margin-bottom:0.2rem; }
+        .author-info span { font-size:0.85rem; color:var(--gray-500); }
+
+        footer{position:relative;z-index:10;text-align:center;padding:3rem;border-top:1px solid var(--glass-border);color:var(--white-dim);font-size:.9rem;}
+        footer a{color:var(--teal);text-decoration:none}
+
+        @media(max-width:768px) {
+            .story-card { flex-direction:column; }
+            .story-img-wrapper { width:100%; height:250px; }
+            .story-content { width:100%; padding:2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="page-hero">
+            <div>
+                <div class="page-hero-badge" data-aos="fade-down"><span></span> Մոտիվացիա և Ոգեշնչում</div>
+                <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Հաջողության <span>Պատմություններ</span></h1>
+                <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Դիաբետը դատավճիռ չէ, այլ պարզապես ապրելակերպ։ Ծանոթացեք մարդկանց իրական պատմություններին, ովքեր հաղթահարել են դժվարությունները և ապրում են լիարժեք կյանքով։</p>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <section style="padding-bottom:100px;">
+                <!-- STORY 1 -->
+                <div class="story-card" data-aos="fade-up">
+                    <div class="story-img-wrapper">
+                        <div class="story-badge">Տիպ 1 Դիաբետ</div>
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80&fit=crop" alt="Yoga woman" class="story-img" />
+                    </div>
+                    <div class="story-content">
+                        <div class="story-quote">Երբ իմացա ախտորոշմանս մասին, կարծում էի, որ կյանքս ավարտվել է: Բայց այն միայն սկսվում էր նոր՝ ավելի առողջ փուլով:</div>
+                        <p class="story-text">Սկզբում դժվար էր ընդունել, որ պետք է ամեն օր ինսուլին ներարկեմ: Սակայն սկսեցի զբաղվել յոգայով, վերանայեցի իմ սննդակարգը և հասկացա, որ այժմ ավելի շատ էներգիա ունեմ, քան նախկինում: Կարևորը սեփական մարմինը լսելն է:</p>
+                        <div class="story-author">
+                            <div class="author-avatar"><i class="fa-solid fa-user"></i></div>
+                            <div class="author-info">
+                                <h4>Անահիտ, 28 տ.</h4>
+                                <span>Ապրում է դիաբետով 5 տարի</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STORY 2 -->
+                <div class="story-card" data-aos="fade-up">
+                    <div class="story-img-wrapper">
+                        <div class="story-badge">Տիպ 2 Դիաբետ</div>
+                        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80&fit=crop" alt="Active man training" class="story-img" />
+                    </div>
+                    <div class="story-content">
+                        <div class="story-quote">Սպորտը դարձավ իմ լավագույն դեղամիջոցը: Ես կորցրի 20 կգ և կարողացա զգալիորեն նվազեցնել դեղորայքի քանակը:</div>
+                        <p class="story-text">45 տարեկանում բժիշկն ինձ ասաց, որ եթե չփոխեմ ապրելակերպս, բարդություններն անխուսափելի կլինեն: Սկսեցի քայլելուց, հետո անցա մարզասրահ: Այսօր իմ շաքարի մակարդակը նորմայի սահմաններում է, և ես ինձ զգում եմ 20 տարեկան:</p>
+                        <div class="story-author">
+                            <div class="author-avatar"><i class="fa-solid fa-person-running"></i></div>
+                            <div class="author-info">
+                                <h4>Արմեն, 48 տ.</h4>
+                                <span>Ապրում է դիաբետով 3 տարի</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer><p>© 2026 DiaBalance — <a href="index.html">Գլխավոր Էջ</a></p></footer>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, easing: 'ease-out-cubic', offset: 80 });
+
+        // THREE JS background
+        (function() {
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.z = 38;
+            scene.fog = new THREE.FogExp2(0xf5f6fa, 0.022);
+
+            const TEAL = new THREE.Color(0x0cbfb0);
+            const BLUE = new THREE.Color(0x1a3c6e);
+            const LIGHTBLUE = new THREE.Color(0x5bc0eb);
+            const N = 40, SP = 22, pos = [], meshes = [], vel = [];
+            const sg = new THREE.SphereGeometry(1, 12, 12);
+
+            for (let i = 0; i < N; i++) {
+                const p = new THREE.Vector3((Math.random() - .5) * SP * 2, (Math.random() - .5) * SP * 1.3, (Math.random() - .5) * SP * 0.7);
+                pos.push(p);
+                const c = Math.random() < 0.4 ? TEAL : Math.random() < 0.8 ? BLUE : LIGHTBLUE;
+                const m = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.3 }));
+                m.scale.setScalar(0.08 + Math.random() * 0.2);
+                m.position.copy(p);
+                scene.add(m);
+                meshes.push(m);
+                vel.push(new THREE.Vector3((Math.random() - .5) * 0.01, (Math.random() - .5) * 0.01, (Math.random() - .5) * 0.005));
+            }
+
+            const lg = new THREE.BufferGeometry(), max = N * (N - 1) / 2, lp = new Float32Array(max * 2 * 3);
+            lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
+            const lm = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x5bc0eb, transparent: true, opacity: 0.1 }));
+            scene.add(lm);
+
+            const mouse = new THREE.Vector2(0, 0);
+            window.addEventListener('mousemove', e => {
+                mouse.x = (e.clientX / window.innerWidth - .5) * 2;
+                mouse.y = (e.clientY / window.innerHeight - .5) * 2;
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                camera.position.x += (mouse.x * 2 - camera.position.x) * 0.03;
+                camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.03;
+                camera.lookAt(scene.position);
+
+                let idx = 0;
+                for (let i = 0; i < N; i++) {
+                    const p = pos[i], v = vel[i];
+                    p.add(v);
+                    if (Math.abs(p.x) > SP) v.x *= -1;
+                    if (Math.abs(p.y) > SP * 0.7) v.y *= -1;
+                    if (Math.abs(p.z) > SP * 0.4) v.z *= -1;
+                    meshes[i].position.copy(p);
+                }
+                
+                for (let a = 0; a < N; a++) {
+                    for (let b = a + 1; b < N; b++) {
+                        if (pos[a].distanceTo(pos[b]) < 8) {
+                            lp[idx++] = pos[a].x; lp[idx++] = pos[a].y; lp[idx++] = pos[a].z;
+                            lp[idx++] = pos[b].x; lp[idx++] = pos[b].y; lp[idx++] = pos[b].z;
+                        }
+                    }
+                }
+                lg.attributes.position.needsUpdate = true;
+                lg.setDrawRange(0, idx / 3);
+                renderer.render(scene, camera);
+            }
+            animate();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Առողջ Բաղադրատոմսեր — DiaBalance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --blue: #1a3c6e;
+            --blue-mid: #2563b0;
+            --teal: #0cbfb0;
+            --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5;
+            --gray-200: #e2e4ed;
+            --gray-500: #8a91a8;
+            --gray-800: #1e2235;
+
+            --deep-blue: var(--bg);
+            --navy: var(--surface);
+            --mid-blue: var(--blue-mid);
+            --teal-glow: rgba(12, 191, 176, 0.25);
+            --teal-dim: rgba(12, 191, 176, 0.12);
+            --white: var(--gray-800);
+            --white-dim: var(--gray-500);
+            --glass-bg: var(--surface);
+            --glass-border: var(--gray-200);
+            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
+            --radius-lg: 26px;
+            --radius-md: 18px;
+            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html, body {
+            width:100%;
+            background: var(--bg);
+            font-family: 'Noto Sans Armenian','DM Sans',sans-serif;
+            color: var(--white);
+            scroll-behavior: smooth;
+        }
+        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        body::after {
+            content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            background-repeat:repeat; background-size:200px; opacity:0.6;
+        }
+        .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(245, 246, 250, 0.75) 100%); }
+
+        /* NAV */
+        nav {
+            position:fixed; top:0; left:0; right:0; z-index:50;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:1.1rem 3rem;
+            background:rgba(255, 255, 255, 0.95);
+            backdrop-filter:blur(16px);
+            border-bottom:1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        .logo { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:600; color:var(--blue); letter-spacing:0.05em; text-decoration:none; }
+        .logo span { color:var(--teal); }
+        
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.4rem;
+            background: var(--teal-soft);
+            color: var(--blue) !important;
+            border: 1px solid rgba(12, 191, 176, 0.25);
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--teal);
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
+        }
+
+        /* CONTENT */
+        .content-wrapper { position:relative; z-index:10; padding-top:80px; }
+        .wrap { max-width:1200px; margin:0 auto; padding:0 5%; }
+        .section-pad { padding:100px 0; }
+
+        /* PAGE HERO */
+        .page-hero {
+            min-height:65vh; display:flex; align-items:center; justify-content:center;
+            text-align:center; padding:120px 5% 80px;
+            background:transparent;
+        }
+        .page-hero-badge {
+            display:inline-flex; align-items:center; gap:0.6rem;
+            padding:0.5rem 1.2rem; border:1px solid rgba(253, 231, 76, 0.8);
+            border-radius:999px; background:rgba(253, 231, 76, 0.2);
+            font-size:0.8rem; font-weight:600; color:#9a7c00;
+            margin-bottom:1.6rem; backdrop-filter:blur(8px);
+        }
+        .page-hero-badge span { width:8px; height:8px; border-radius:50%; background:#fde74c; box-shadow:0 0 10px #fde74c; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+        .page-title { font-size:clamp(2.8rem,6vw,5rem); font-weight:700; line-height:1.15; margin-bottom:1.5rem; color:var(--blue); }
+        .page-title span { color:#f5a623; text-shadow:0 0 30px rgba(245, 166, 35, 0.3); }
+        .page-subtitle { font-size:1.2rem; color:var(--white-dim); max-width:600px; margin:0 auto; line-height:1.8; }
+
+        /* SHARED COMPONENTS */
+        .glass-card {
+            background:var(--glass-bg); backdrop-filter:blur(16px);
+            border:1px solid var(--glass-border); border-radius:var(--radius-lg);
+            box-shadow:var(--glass-shadow); transition:all var(--transition); position:relative; overflow:hidden;
+        }
+        .glass-card:hover { border-color:var(--teal); box-shadow:0 15px 50px rgba(26,188,156,0.1); }
+        .ds-label { display:inline-flex; align-items:center; gap:10px; background:var(--teal-dim); color:var(--teal); border:1px solid rgba(26,188,156,0.2); font-size:0.85rem; font-weight:700; padding:8px 18px; border-radius:100px; margin-bottom:1.5rem; }
+        .ds-h2 { font-size:clamp(2rem,4vw,3rem); font-weight:700; color:var(--blue); margin-bottom:1.5rem; line-height:1.2; }
+        .ds-sub { font-size:1.05rem; color:var(--white-dim); line-height:1.8; }
+
+        /* RECIPE GRID */
+        .recipe-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:2.5rem; }
+        .recipe-card { display:flex; flex-direction:column; padding:1.5rem; border-radius:24px; }
+        .recipe-img { width:100%; height:220px; border-radius:16px; object-fit:cover; margin-bottom:1.5rem; box-shadow:0 10px 30px rgba(26,60,110,0.08); transition:transform 0.4s; }
+        .recipe-card:hover .recipe-img { transform:scale(1.03); }
+        
+        .recipe-tags { display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap; }
+        .tag-time { font-size:0.8rem; font-weight:700; color:var(--blue); background:var(--gray-100); padding:4px 10px; border-radius:8px; border:1px solid var(--gray-200); display:flex; align-items:center; gap:5px; }
+        .tag-cal { font-size:0.8rem; font-weight:700; color:#e05252; background:rgba(224, 82, 82, 0.1); padding:4px 10px; border-radius:8px; border:1px solid rgba(224, 82, 82, 0.2); display:flex; align-items:center; gap:5px; }
+        .tag-xe { font-size:0.8rem; font-weight:700; color:var(--teal); background:var(--teal-soft); padding:4px 10px; border-radius:8px; border:1px solid rgba(12, 191, 176, 0.2); }
+        
+        .recipe-title { font-size:1.4rem; font-weight:700; color:var(--blue); margin-bottom:0.8rem; }
+        .recipe-desc { font-size:0.95rem; color:var(--gray-500); line-height:1.6; margin-bottom:1.5rem; flex-grow:1; }
+        
+        .recipe-footer { display:flex; align-items:center; justify-content:space-between; padding-top:1.2rem; border-top:1px solid var(--gray-200); }
+        .read-more { color:var(--teal); font-weight:700; font-size:0.95rem; text-decoration:none; display:flex; align-items:center; gap:5px; transition:gap 0.2s; }
+        .recipe-card:hover .read-more { gap:10px; }
+
+        footer{position:relative;z-index:10;text-align:center;padding:3rem;border-top:1px solid var(--glass-border);color:var(--white-dim);font-size:.9rem; margin-top:5rem;}
+        footer a{color:var(--teal);text-decoration:none}
+
+        @media(max-width:768px) { .recipe-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="page-hero">
+            <div>
+                <div class="page-hero-badge" data-aos="fade-down"><span></span> Համեղ և Առողջարար</div>
+                <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Առողջ <span>Բաղադրատոմսեր</span></h1>
+                <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Սնվել առողջարար չի նշանակում հրաժարվել համից: Բացահայտեք դիաբետիկների համար նախատեսված համեղ, պարզ և բալանսավորված բաղադրատոմսերի մեր հավաքածուն:</p>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <section class="section-pad" id="recipes" style="padding-top:0;">
+                <div style="text-align:center;margin-bottom:4rem" data-aos="fade-up">
+                    <div class="ds-label"><i class="fa-solid fa-bowl-food"></i> Մենյուի Գաղափարներ</div>
+                    <h2 class="ds-h2">Նախաճաշ, Ճաշ, Ընթրիք</h2>
+                    <p class="ds-sub" style="margin:0 auto">Ցածր ածխաջրերով և հարուստ վիտամիններով տարբերակներ յուրաքանչյուր օրվա համար:</p>
+                </div>
+
+                <div class="recipe-grid">
+                    <!-- RECIPE 1 -->
+                    <div class="glass-card recipe-card" data-aos="fade-up" data-aos-delay="0">
+                        <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80&fit=crop" alt="Healthy Bowl" class="recipe-img" />
+                        <div class="recipe-tags">
+                            <span class="tag-time"><i class="fa-regular fa-clock"></i> 25 րոպե</span>
+                            <span class="tag-cal"><i class="fa-solid fa-fire"></i> 320 կկալ</span>
+                            <span class="tag-xe">2.0 XE</span>
+                        </div>
+                        <h3 class="recipe-title">Սպանախով և Կինոայով Աղցան</h3>
+                        <p class="recipe-desc">Թարմ սպանախ, խաշած կինոա, նուշ և նռան հատիկներ՝ համեմված ձիթապտղի յուղով և կիտրոնի հյութով: Կատարյալ թեթև ճաշ կամ ընթրիք ցածր ԳԻ-ով:</p>
+                        <div class="recipe-footer">
+                            <a href="#" class="read-more">Բացել բաղադրատոմսը <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- RECIPE 2 -->
+                    <div class="glass-card recipe-card" data-aos="fade-up" data-aos-delay="100">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&fit=crop" alt="Healthy Bowl" class="recipe-img" />
+                        <div class="recipe-tags">
+                            <span class="tag-time"><i class="fa-regular fa-clock"></i> 40 րոպե</span>
+                            <span class="tag-cal"><i class="fa-solid fa-fire"></i> 450 կկալ</span>
+                            <span class="tag-xe">1.5 XE</span>
+                        </div>
+                        <h3 class="recipe-title">Ջեռոցում Եփված Սաղմոն Բանջարեղենով</h3>
+                        <p class="recipe-desc">Օմեգա-3-ով հարուստ սաղմոն՝ շոգեխաշված բրոկոլիի, գազարի և բուլղարական պղպեղի հետ: Չի պարունակում արագ ածխաջրեր և հագեցնում է երկար ժամանակով:</p>
+                        <div class="recipe-footer">
+                            <a href="#" class="read-more">Բացել բաղադրատոմսը <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- RECIPE 3 -->
+                    <div class="glass-card recipe-card" data-aos="fade-up" data-aos-delay="200">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80&fit=crop" alt="Avocado Toast" class="recipe-img" />
+                        <div class="recipe-tags">
+                            <span class="tag-time"><i class="fa-regular fa-clock"></i> 10 րոպե</span>
+                            <span class="tag-cal"><i class="fa-solid fa-fire"></i> 280 կկալ</span>
+                            <span class="tag-xe">1.0 XE</span>
+                        </div>
+                        <h3 class="recipe-title">Ավոկադոյով Տոստ և Ձու</h3>
+                        <p class="recipe-desc">Տարեկանի հացի վրա քսված թարմ ավոկադո և խաշած կամ տապակած ձու՝ առանց յուղի: Հիանալի և սննդարար նախաճաշ էներգիայով լիցքավորվելու համար:</p>
+                        <div class="recipe-footer">
+                            <a href="#" class="read-more">Բացել բաղադրատոմսը <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer><p>© 2026 DiaBalance — <a href="index.html">Գլխավոր Էջ</a></p></footer>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, easing: 'ease-out-cubic', offset: 80 });
+
+        // THREE JS background
+        (function() {
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.z = 38;
+            scene.fog = new THREE.FogExp2(0xf5f6fa, 0.022);
+
+            const TEAL = new THREE.Color(0x0cbfb0);
+            const BLUE = new THREE.Color(0x1a3c6e);
+            const N = 45, SP = 22, pos = [], meshes = [], vel = [];
+            const sg = new THREE.SphereGeometry(1, 12, 12);
+
+            for (let i = 0; i < N; i++) {
+                const p = new THREE.Vector3((Math.random() - .5) * SP * 2, (Math.random() - .5) * SP * 1.3, (Math.random() - .5) * SP * 0.7);
+                pos.push(p);
+                const c = Math.random() < 0.6 ? TEAL : BLUE;
+                const m = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.35 }));
+                m.scale.setScalar(0.08 + Math.random() * 0.2);
+                m.position.copy(p);
+                scene.add(m);
+                meshes.push(m);
+                vel.push(new THREE.Vector3((Math.random() - .5) * 0.01, (Math.random() - .5) * 0.01, (Math.random() - .5) * 0.005));
+            }
+
+            const lg = new THREE.BufferGeometry(), max = N * (N - 1) / 2, lp = new Float32Array(max * 2 * 3);
+            lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
+            const lm = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x0cbfb0, transparent: true, opacity: 0.08 }));
+            scene.add(lm);
+
+            const mouse = new THREE.Vector2(0, 0);
+            window.addEventListener('mousemove', e => {
+                mouse.x = (e.clientX / window.innerWidth - .5) * 2;
+                mouse.y = (e.clientY / window.innerHeight - .5) * 2;
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                camera.position.x += (mouse.x * 2 - camera.position.x) * 0.03;
+                camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.03;
+                camera.lookAt(scene.position);
+
+                let idx = 0;
+                for (let i = 0; i < N; i++) {
+                    const p = pos[i], v = vel[i];
+                    p.add(v);
+                    if (Math.abs(p.x) > SP) v.x *= -1;
+                    if (Math.abs(p.y) > SP * 0.7) v.y *= -1;
+                    if (Math.abs(p.z) > SP * 0.4) v.z *= -1;
+                    meshes[i].position.copy(p);
+                }
+                
+                for (let a = 0; a < N; a++) {
+                    for (let b = a + 1; b < N; b++) {
+                        if (pos[a].distanceTo(pos[b]) < 8) {
+                            lp[idx++] = pos[a].x; lp[idx++] = pos[a].y; lp[idx++] = pos[a].z;
+                            lp[idx++] = pos[b].x; lp[idx++] = pos[b].y; lp[idx++] = pos[b].z;
+                        }
+                    }
+                }
+                lg.attributes.position.needsUpdate = true;
+                lg.setDrawRange(0, idx / 3);
+                renderer.render(scene, camera);
+            }
+            animate();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Khorkhurdner — DiaBalance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --blue: #1a3c6e;
+            --blue-mid: #2563b0;
+            --teal: #0cbfb0;
+            --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5;
+            --gray-200: #e2e4ed;
+            --gray-500: #8a91a8;
+            --gray-800: #1e2235;
+
+            --deep-blue: var(--bg);
+            --navy: var(--surface);
+            --mid-blue: var(--blue-mid);
+            --teal-glow: rgba(12, 191, 176, 0.25);
+            --teal-dim: rgba(12, 191, 176, 0.12);
+            --white: var(--gray-800);
+            --white-dim: var(--gray-500);
+            --glass-bg: var(--surface);
+            --glass-border: var(--gray-200);
+            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
+            --radius-lg: 26px;
+            --radius-md: 18px;
+            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html,body{width:100%;background:var(--bg);font-family:'Noto Sans Armenian','DM Sans',sans-serif;color:var(--white);scroll-behavior:smooth}
+        #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+        body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            background-repeat:repeat;background-size:200px;opacity:0.6}
+        .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(245, 246, 250, 0.75) 100%)}
+
+        /* ═══ NAVBAR ═══ */
+        nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255, 255, 255, 0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
+        .logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--blue);letter-spacing:.05em;text-decoration:none}
+        .logo span{color:var(--teal)}
+        .nav-back-btn { display:inline-flex; align-items:center; gap:0.6rem; padding:0.6rem 1.4rem; background:var(--teal-soft); color:var(--blue) !important; border:1px solid rgba(12,191,176,0.25); border-radius:100px; font-size:0.9rem; font-weight:600; text-decoration:none; transition:all 0.3s ease; }
+        .nav-back-btn:hover { background:var(--teal); color:#ffffff !important; transform:translateY(-2px); box-shadow:0 4px 15px rgba(12,191,176,0.3); }
+
+        /* LAYOUT */
+        .content-wrapper{position:relative;z-index:10;padding-top:80px}
+        .wrap{max-width:1280px;margin:0 auto;padding:0 4%}
+        .section-pad{padding:100px 0}
+
+        /* PAGE HERO */
+        .page-hero{min-height:65vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:130px 5% 80px}
+        .page-hero-badge{display:inline-flex;align-items:center;gap:.6rem;padding:.5rem 1.2rem;border:1px solid rgba(26,188,156,.35);border-radius:999px;background:var(--teal-dim);font-size:.8rem;font-weight:600;color:var(--teal);margin-bottom:1.6rem;backdrop-filter:blur(8px)}
+        .page-hero-badge span{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+        .page-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:700;line-height:1.15;margin-bottom:1.5rem}
+        .page-title span{color:var(--teal);text-shadow:0 0 30px rgba(26,188,156,.5)}
+        .page-subtitle{font-size:1.15rem;color:var(--white-dim);max-width:640px;margin:0 auto;line-height:1.8}
+        .ds-label{display:inline-flex;align-items:center;gap:10px;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(26,188,156,.2);font-size:.85rem;font-weight:700;padding:8px 18px;border-radius:100px;margin-bottom:1.5rem;backdrop-filter:blur(10px)}
+        .ds-h2{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--white);margin-bottom:1.5rem;line-height:1.2}
+        .ds-sub{font-size:1.05rem;color:var(--white-dim);line-height:1.8}
+        .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(26,188,156,.3),transparent);margin:0}
+
+        /* ═══ BENTO / MASONRY GRID ═══ */
+        .bento-grid{
+            display:grid;
+            grid-template-columns:repeat(12, 1fr);
+            grid-template-rows:auto;
+            gap:1.5rem;
+            margin-bottom:5rem
+        }
+        .bento-card{
+            position:relative;overflow:hidden;border-radius:var(--radius-lg);
+            box-shadow:var(--glass-shadow);transition:all var(--transition);cursor:pointer
+        }
+        .bento-card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 25px 60px rgba(26,188,156,.3)}
+        .bento-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
+        .bento-card:hover img{transform:scale(1.1)}
+        .bento-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(13,27,42,.95) 0%,rgba(13,27,42,.4) 50%,transparent 100%);transition:background .3s}
+        .bento-card:hover .bento-overlay{background:linear-gradient(to top,rgba(13,27,42,.98) 0%,rgba(13,27,42,.5) 60%,rgba(26,188,156,.05) 100%)}
+        .bento-content{position:absolute;bottom:0;left:0;right:0;padding:2rem}
+        .bento-tag{display:inline-block;padding:.3rem .9rem;background:rgba(26,188,156,.2);border:1px solid rgba(26,188,156,.3);color:var(--teal);border-radius:100px;font-size:.75rem;font-weight:700;margin-bottom:.8rem;backdrop-filter:blur(8px)}
+        .bento-content h3{font-size:1.3rem;font-weight:700;color:#ffffff;margin-bottom:.5rem;line-height:1.3}
+        .bento-content p{font-size:.88rem;color:#d0d4e3;line-height:1.6;opacity:0;transform:translateY(8px);transition:all .35s}
+        .bento-card:hover .bento-content p{opacity:1;transform:translateY(0)}
+        .bento-content .arrow{display:inline-flex;align-items:center;gap:.4rem;margin-top:.8rem;color:var(--teal);font-size:.85rem;font-weight:700;opacity:0;transform:translateX(-8px);transition:all .35s .05s}
+        .bento-card:hover .bento-content .arrow{opacity:1;transform:translateX(0)}
+
+        /* Grid positions */
+        .b1{grid-column:1/7;grid-row:1/3;min-height:500px}
+        .b2{grid-column:7/10;grid-row:1;min-height:240px}
+        .b3{grid-column:10/13;grid-row:1;min-height:240px}
+        .b4{grid-column:7/10;grid-row:2;min-height:240px}
+        .b5{grid-column:10/13;grid-row:2;min-height:240px}
+        .b6{grid-column:1/5;grid-row:3;min-height:300px}
+        .b7{grid-column:5/9;grid-row:3;min-height:300px}
+        .b8{grid-column:9/13;grid-row:3;min-height:300px}
+
+        /* TIP NUMBERS CARDS */
+        .tips-numbered{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2rem;margin-bottom:4rem}
+        .tip-n-card{
+            display:flex;gap:1.5rem;align-items:flex-start;
+            padding:2rem 2.5rem;
+            background:var(--glass-bg);backdrop-filter:blur(16px);
+            border:1px solid var(--glass-border);border-radius:24px;
+            box-shadow:var(--glass-shadow);transition:all var(--transition)
+        }
+        .tip-n-card:hover{border-color:var(--teal);transform:translateX(6px);box-shadow:0 15px 40px rgba(26,188,156,.15)}
+        .tip-n-num{font-family:'DM Sans',sans-serif;font-size:3.5rem;font-weight:800;color:var(--teal);opacity:.2;line-height:1;transition:opacity .3s;flex-shrink:0;width:52px;text-align:right}
+        .tip-n-card:hover .tip-n-num{opacity:.7;text-shadow:0 0 20px rgba(26,188,156,.6)}
+        .tip-n-body{}
+        .tip-n-icon{font-size:1.5rem;color:var(--teal);margin-bottom:.6rem}
+        .tip-n-body strong{display:block;font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:.5rem}
+        .tip-n-body p{font-size:.93rem;color:var(--white-dim);line-height:1.65}
+
+        /* NUTRITION TABLE */
+        .nutrition-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:4rem}
+        .nutrition-col{padding:2.5rem;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:blur(14px);border-radius:24px;box-shadow:var(--glass-shadow)}
+        .nutrition-col h3{font-size:1.3rem;font-weight:700;color:var(--white);margin-bottom:1.5rem;display:flex;align-items:center;gap:.7rem}
+        .food-list{display:flex;flex-direction:column;gap:.8rem}
+        .food-item{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;border-radius:12px;background:var(--gray-100);border:1px solid var(--gray-200);transition:background .2s}
+        .food-item:hover{background:var(--teal-soft); border-color:var(--teal)}
+        .food-item i{font-size:1.2rem;width:28px;text-align:center}
+        .food-item span{font-size:.93rem;color:var(--white-dim)}
+        .food-item .food-note{margin-left:auto;font-size:.78rem;padding:.2rem .6rem;border-radius:8px;font-weight:700;flex-shrink:0}
+        .note-good{background:rgba(26,188,156,.12);color:var(--teal)}
+        .note-limit{background:rgba(253,231,76,.12);color:#fde74c}
+        .note-avoid{background:rgba(224,82,82,.12);color:#e05252}
+
+        footer{position:relative;z-index:10;text-align:center;padding:3rem;border-top:1px solid var(--glass-border);color:var(--white-dim);font-size:.9rem}
+        footer a{color:var(--teal);text-decoration:none}
+
+        @media(max-width:1024px){
+            .b1{grid-column:1/8;min-height:380px}
+            .b2,.b3{grid-column:span 5}
+            .b4,.b5{grid-column:span 5}
+            .b6,.b7,.b8{grid-column:span 4}
+        }
+        @media(max-width:768px){
+            .bento-grid{display:flex;flex-direction:column}
+            .bento-card{min-height:280px !important}
+            .b1{min-height:360px !important}
+            .nutrition-grid{grid-template-columns:1fr}
+            nav{padding:1rem 1.5rem}
+            .nav-links{display:none}
+        }
+    </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="vignette"></div>
+
+<!-- SHARED NAV -->
+<nav id="navbar">
+    <a href="index.html" class="logo">Dia<span>Balance</span></a>
+    <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+</nav>
+
+<div class="content-wrapper">
+
+    <!-- HERO -->
+    <div class="page-hero">
+        <div>
+            <div class="page-hero-badge" data-aos="fade-down"><span></span> Ապրելակերպ և Առողջություն</div>
+            <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Խորհուրդներ <span>Դիաբետիկներին</span></h1>
+            <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Փոքր քայլերով՝ դեպի մեծ արդյունք: Պարզագույն ամենօրյա սովորություններ, որոնք զգալիորեն կբարելավեն ձեր ինքնազգացողությունը:</p>
+        </div>
+    </div>
+
+    <div class="wrap">
+
+        <!-- BENTO PHOTO GALLERY -->
+        <section id="food">
+            <div style="text-align:center;margin-bottom:3rem" data-aos="fade-up">
+                <div class="ds-label"><i class="fa-solid fa-camera"></i> Պատկերասրահ</div>
+                <h2 class="ds-h2">Լիարժեք Կյանք</h2>
+                <p class="ds-sub" style="margin:0 auto">Ոգեշնչող օրինակներ առողջ և ակտիվ ապրելակերպ վարելու համար:</p>
+            </div>
+
+            <div class="bento-grid" data-aos="fade-up" data-aos-delay="100">
+                <div class="bento-card b1">
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&q=85&fit=crop" alt="Healthy food bowl" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-leaf"></i> Սնունդ</span>
+                        <h3>Առողջարար և Համեղ</h3>
+                        <p>Բանջարեղենով և սպիտակուցներով հարուստ սնունդը դիաբետի վերահսկման գլխավոր զենքն է:</p>
+                        <span class="arrow"><i class="fa-solid fa-arrow-right"></i> Իմանալ ավելին</span>
+                    </div>
+                </div>
+                <div class="bento-card b2">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=700&q=80&fit=crop" alt="Running exercise" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-person-running"></i> Սպորտ</span>
+                        <h3>Ֆիզիկական Ակտիվություն</h3>
+                        <p>Կարդիոմարզումները դրական են ազդում արյան գլյուկոզայի մակարդակի վրա:</p>
+                        <span class="arrow">Ավելին <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b3">
+                    <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=80&fit=crop" alt="Salad meal prep" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-bowl-food"></i> Սննդի Պլանավորում</span>
+                        <h3>Նախապատրաստում</h3>
+                        <p>Շաբաթվա ճաշերի պլանավորումը հեշտացնում է վերահսկել ածխաջրերի քանակը:</p>
+                        <span class="arrow">Կարդալ հաջորդիվ <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b4">
+                    <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=700&q=80&fit=crop" alt="Yoga meditation" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-spa"></i> Յոգա</span>
+                        <h3>Յոգա և Հանգիստ</h3>
+                        <p>Սթրեսի կառավարումն իջեցնում է կորտիզոլի մակարդակն ու կարգավորում գլյուկոզան:</p>
+                        <span class="arrow">Ինչպես հանգստանալ <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b5">
+                    <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=700&q=80&fit=crop" alt="Fresh vegetables" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-carrot"></i> Բանջարեղեն</span>
+                        <h3>Կանաչեղեն և Բալանս</h3>
+                        <p>Ցածր գլիկեմիկ ինդեքսով մթերքներն օգնում են խուսափել շաքարի տատանումներից:</p>
+                        <span class="arrow">Ընտրել ճիշտ <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b6">
+                    <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80&fit=crop" alt="Morning walk nature" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-sun"></i> Ամենօրյա Ռեժիմ</span>
+                        <h3>Առավոտյան Սովորություններ</h3>
+                        <p>Կանոնավոր ռեժիմով արթնանալն ու նախաճաշելն ապահովում է կայունություն:</p>
+                        <span class="arrow">Սկսել առավոտը <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b7">
+                    <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=700&q=80&fit=crop" alt="Healthy cooking" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-fire-burner"></i> Խոհարարություն</span>
+                        <h3>Տնական Ուտելիք</h3>
+                        <p>Տանը պատրաստելով դուք 100%-ով վերահսկում եք ձեր օգտագործած բաղադրիչները:</p>
+                        <span class="arrow">Բաղադրատոմսեր <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="bento-card b8">
+                    <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=700&q=80&fit=crop" alt="Fitness training" loading="lazy"/>
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="bento-tag"><i class="fa-solid fa-dumbbell"></i> Ֆիթնես</span>
+                        <h3>Ամուր Մարմին</h3>
+                        <p>Ամուր մկանները բարձրացնում են օրգանիզմի զգայունությունը ինսուլինի նկատմամբ:</p>
+                        <span class="arrow">Մարզումների տեսակներ <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- SPORT SECTION -->
+        <section id="sport" class="section-pad">
+            <div style="text-align:center;margin-bottom:4rem" data-aos="fade-up">
+                <div class="ds-label"><i class="fa-solid fa-dumbbell"></i> Ֆիզիկական Ակտիվություն</div>
+                <h2 class="ds-h2">Սպորտ և Շարժում</h2>
+                <p class="ds-sub" style="margin:0 auto">Կանոնավոր մարզումներն օգնում են կարգավորել արյան շաքարը և բարելավել ինսուլինի նկատմամբ զգայունությունը:</p>
+            </div>
+            <div class="nutrition-grid" data-aos="fade-up" data-aos-delay="200">
+                <div class="nutrition-col">
+                    <h3><i class="fa-solid fa-person-running" style="color:var(--teal)"></i> Առաջարկվող Մարզումներ</h3>
+                    <div class="food-list">
+                        <div class="food-item"><i class="fa-solid fa-shoe-prints" style="color:var(--teal)"></i><span>Արագ քայլք (30-40 րոպե)</span><span class="food-note note-good">Ամեն օր</span></div>
+                        <div class="food-item"><i class="fa-solid fa-person-swimming" style="color:#5bc0eb"></i><span>Լող և ակվաաէրոբիկա</span><span class="food-note note-good">Շաբաթը 2-3 անգամ</span></div>
+                        <div class="food-item"><i class="fa-solid fa-bicycle" style="color:#e87c2b"></i><span>Հեծանվավազք (թեթև տեմպ)</span><span class="food-note note-good">Լավ է սրտի համար</span></div>
+                        <div class="food-item"><i class="fa-solid fa-spa" style="color:#28a745"></i><span>Յոգա և ձգումներ</span><span class="food-note note-good">Նվազեցնում է սթրեսը</span></div>
+                        <div class="food-item"><i class="fa-solid fa-dumbbell" style="color:#fde74c"></i><span>Թեթև ծանրաձողերով մարզում</span><span class="food-note note-limit">Շաբաթը 2 անգամ</span></div>
+                    </div>
+                </div>
+                <div class="nutrition-col">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color:#fde74c"></i> Կարևոր Կանոններ Մարզվելիս</h3>
+                    <div class="food-list">
+                        <div class="food-item"><i class="fa-solid fa-droplet" style="color:#e05252"></i><span>Չափեք շաքարը մարզումից առաջ</span><span class="food-note note-limit">Պարտադիր է</span></div>
+                        <div class="food-item"><i class="fa-solid fa-apple-whole" style="color:#fde74c"></i><span>Միշտ ունեցեք քաղցրավենիք/հյութ ձեզ մոտ</span><span class="food-note note-good">Հիպոգլիկեմիայի դեպքում</span></div>
+                        <div class="food-item"><i class="fa-solid fa-bottle-water" style="color:#5bc0eb"></i><span>Խմեք շատ ջուր մարզման ընթացքում</span><span class="food-note note-good">Խուսափեք ջրազրկումից</span></div>
+                        <div class="food-item"><i class="fa-solid fa-ban" style="color:#e05252"></i><span>Մի մարզվեք, եթե շաքարը > 14 մմոլ/լ է</span><span class="food-note note-avoid">Վտանգավոր է</span></div>
+                        <div class="food-item"><i class="fa-solid fa-shoe-prints" style="color:#e87c2b"></i><span>Կրեք հարմարավետ մարզակոշիկներ</span><span class="food-note note-limit">Ոտնաթաթի պաշտպանություն</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- NUMBERED TIPS -->
+        <section id="daily" class="section-pad">
+            <div style="text-align:center;margin-bottom:4rem" data-aos="fade-up">
+                <div class="ds-label"><i class="fa-solid fa-lightbulb"></i> Կարևոր Խորհուրդներ</div>
+                <h2 class="ds-h2">10 Ոսկե Կանոններ</h2>
+                <p class="ds-sub" style="margin:0 auto">Պահպանեք այս պարզ կանոնները, որոնք զգալիորեն կբարելավեն ձեր առողջությունն ու կյանքի որակը:</p>
+            </div>
+            <div class="tips-numbered">
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="0">
+                    <span class="tip-n-num">1</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-utensils"></i></div>
+                        <strong>Սնվեք միևնույն ժամերին</strong>
+                        <p>Սննդի կանոնավորումը կայունացնում է արյան շաքարի ամենօրյա մակարդակը:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="80">
+                    <span class="tip-n-num">2</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-shoe-prints"></i></div>
+                        <strong>10 րոպե քայլք ուտելուց հետո</strong>
+                        <p>Ուտելուց անմիջապես հետո թեթև քայլքը կարող է իջեցնել շաքարը 20-30%-ով:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="160">
+                    <span class="tip-n-num">3</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-glass-water"></i></div>
+                        <strong>Խմեք բավարար քանակությամբ ջուր</strong>
+                        <p>Ջրազրկումը բարձրացնում է արյան շաքարը: Նորման մոտ 30 մլ է 1 կգ մարմնի քաշի համար:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="240">
+                    <span class="tip-n-num">4</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-book-medical"></i></div>
+                        <strong>Վարեք հսկողության օրագիր</strong>
+                        <p>Չափումները, սնունդը և տրամադրությունը գրանցելը կօգնի ձեզ և ձեր բժշկին:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="320">
+                    <span class="tip-n-num">5</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-moon"></i></div>
+                        <strong>Լիարժեք և հանգիստ քուն</strong>
+                        <p>7-8 ժամ խորը քունը նվազեցնում է սթրեսը և լավացնում ինսուլինի ընկալումը:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="400">
+                    <span class="tip-n-num">6</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-carrot"></i></div>
+                        <strong>Ավելացրեք բջջանքով հարուստ սնունդ</strong>
+                        <p>Բջջանքը դանդաղեցնում է ածխաջրերի ներծծումը և կանխում գլյուկոզայի կտրուկ տատանումները:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="480">
+                    <span class="tip-n-num">7</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-dumbbell"></i></div>
+                        <strong>Կանոնավոր ակտիվություն</strong>
+                        <p>Շաբաթական մոտ 150 րոպե ֆիզիկական ակտիվությունը նվազեցնում է ինսուլինառեզիստենտությունը:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="560">
+                    <span class="tip-n-num">8</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <strong>Մի մոռացեք բժշկական ստուգումները</strong>
+                        <p>HbA1c թեստ (3 ամիսը մեկ), ակնաբույժ, նեֆրոլոգ՝ սա ձեր անվտանգության երաշխիքն է:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="640">
+                    <span class="tip-n-num">9</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-heart"></i></div>
+                        <strong>Պաշտպանեք սիրտն ու անոթները</strong>
+                        <p>Դիաբետը բարձրացնում է սիրտ-անոթային ռիսկը: Վերահսկեք ճնշումն ու խոլեստերինը:</p>
+                    </div>
+                </div>
+                <div class="tip-n-card" data-aos="fade-up" data-aos-delay="720">
+                    <span class="tip-n-num">10</span>
+                    <div class="tip-n-body">
+                        <div class="tip-n-icon"><i class="fa-solid fa-users"></i></div>
+                        <strong>Շփվեք և մի մեկուսացեք</strong>
+                        <p>Աջակցության խմբերը կարևոր են հոգեբանական կայունության և փորձի փոխանակման համար:</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- NUTRITION TABLE -->
+        <section id="nutrition" class="section-pad">
+            <div style="text-align:center;margin-bottom:4rem" data-aos="fade-up">
+                <div class="ds-label"><i class="fa-solid fa-bowl-food"></i> Սննդային Ուղեցույց</div>
+                <h2 class="ds-h2">Ինչ ուտել և ինչից խուսափել</h2>
+            </div>
+            <div class="nutrition-grid" data-aos="fade-up" data-aos-delay="200">
+                <div class="nutrition-col">
+                    <h3><i class="fa-solid fa-check-circle" style="color:var(--teal)"></i> Կարևոր և Օգտակար</h3>
+                    <div class="food-list">
+                        <div class="food-item"><i class="fa-solid fa-leaf" style="color:var(--teal)"></i><span>Կանաչեղեն (բրոկոլի, սպանախ, աղցաններ)</span><span class="food-note note-good">Ամեն օր</span></div>
+                        <div class="food-item"><i class="fa-solid fa-apple-whole" style="color:#28a745"></i><span>Խնձոր և հատապտուղներ</span><span class="food-note note-good">Կարգին է</span></div>
+                        <div class="food-item"><i class="fa-solid fa-fish" style="color:#5bc0eb"></i><span>Ձկնեղեն և ծովամթերք</span><span class="food-note note-good">Օգտակար է</span></div>
+                        <div class="food-item"><i class="fa-solid fa-egg" style="color:#fde74c"></i><span>Ձու և թռչնամիս</span><span class="food-note note-good">Սպիտակուց</span></div>
+                        <div class="food-item"><i class="fa-solid fa-seedling" style="color:var(--teal)"></i><span>Ընկուզեղեն (նուշ, ընկույզ)</span><span class="food-note note-good">Խորհուրդ է տրվում</span></div>
+                        <div class="food-item"><i class="fa-solid fa-wheat-awn" style="color:#e87c2b"></i><span>Ամբողջահատիկներ (վարսակ, տարեկան)</span><span class="food-note note-good">Ցածր ԳԻ</span></div>
+                        <div class="food-item"><i class="fa-solid fa-bottle-water" style="color:#5bc0eb"></i><span>Ջուր, կանաչ թեյ</span><span class="food-note note-good">Ամենօրյա</span></div>
+                    </div>
+                </div>
+                <div class="nutrition-col">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color:#fde74c"></i> Սահմանափակել և Խուսափել</h3>
+                    <div class="food-list">
+                        <div class="food-item"><i class="fa-solid fa-candy-cane" style="color:#e05252"></i><span>Շաքար, մարմելադ, տորթեր</span><span class="food-note note-avoid">Խուսափել</span></div>
+                        <div class="food-item"><i class="fa-solid fa-bread-slice" style="color:#fde74c"></i><span>Սպիտակ հաց և բագետ</span><span class="food-note note-limit">Սահմանափակել</span></div>
+                        <div class="food-item"><i class="fa-solid fa-beer-mug-empty" style="color:#e87c2b"></i><span>Ալկոհոլ և գազավորված ըմպելիքներ</span><span class="food-note note-avoid">Խիստ վտանգավոր</span></div>
+                        <div class="food-item"><i class="fa-solid fa-burger" style="color:#e05252"></i><span>Արագ սնունդ և ֆրի</span><span class="food-note note-avoid">Խիստ վտանգավոր</span></div>
+                        <div class="food-item"><i class="fa-solid fa-cheese" style="color:#fde74c"></i><span>Տրանս ճարպերով մթերքներ</span><span class="food-note note-limit">Սահմանափակել</span></div>
+                        <div class="food-item"><i class="fa-solid fa-bottle-droplet" style="color:#e87c2b"></i><span>Շաքար պարունակող վաճառքի հյութեր</span><span class="food-note note-avoid">Բացառել</span></div>
+                        <div class="food-item"><i class="fa-solid fa-potato" style="color:#fde74c"></i><span>Կարտոֆիլ և սպիտակ բրինձ</span><span class="food-note note-limit">Պահպանել նորման</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer><p>© 2026 DiaBalance — <a href="index.html">Գլխավոր Էջ</a></p></footer>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({once:true,easing:'ease-out-cubic',offset:80});
+
+(function(){
+    const canvas=document.getElementById('bg-canvas');
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setClearColor(0x000000,0);
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,200);
+    camera.position.z=38;
+    scene.fog=new THREE.FogExp2(0x0d1b2a,0.022);
+    const TEAL=new THREE.Color(0x1abc9c),BLUE=new THREE.Color(0x2c3e50),WHITE=new THREE.Color(0xd0e8ff);
+    const N=55,SP=22,LD=9,pos=[],meshes=[],vel=[],ph=[];
+    const sg=new THREE.SphereGeometry(1,12,12);
+    for(let i=0;i<N;i++){
+        const p=new THREE.Vector3((Math.random()-.5)*SP*2,(Math.random()-.5)*SP*1.3,(Math.random()-.5)*SP*0.7);
+        pos.push(p);ph.push(Math.random()*Math.PI*2);
+        const t=Math.random();const c=t<0.4?TEAL.clone():t<0.75?BLUE.clone().lerp(TEAL,0.3):WHITE.clone();
+        const r=0.08+Math.random()*0.28;
+        const m=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.8}));
+        m.scale.setScalar(r);m.position.copy(p);scene.add(m);meshes.push(m);
+        vel.push(new THREE.Vector3((Math.random()-.5)*0.008,(Math.random()-.5)*0.008,(Math.random()-.5)*0.004));
+    }
+    const lg=new THREE.BufferGeometry(),max=N*(N-1)/2,lp=new Float32Array(max*2*3);
+    lg.setAttribute('position',new THREE.BufferAttribute(lp,3));
+    const lm=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x1abc9c,transparent:true,opacity:0.12}));
+    scene.add(lm);
+    const mouse=new THREE.Vector2(0,0);
+    window.addEventListener('mousemove',e=>{mouse.x=(e.clientX/window.innerWidth-.5)*2;mouse.y=(e.clientY/window.innerHeight-.5)*2});
+    window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight)});
+    const clock=new THREE.Clock();
+    function animate(){
+        requestAnimationFrame(animate);const t=clock.getElapsedTime();
+        camera.position.x+=(mouse.x*4-camera.position.x)*0.03;camera.position.y+=(-mouse.y*3-camera.position.y)*0.03;camera.lookAt(scene.position);
+        for(let i=0;i<N;i++){const v=vel[i],p=pos[i],pph=ph[i];p.x+=v.x+Math.cos(t*0.3+pph)*0.01;p.y+=v.y+Math.sin(t*0.4+pph)*0.015;p.z+=v.z;if(Math.abs(p.x)>SP)v.x*=-1;if(Math.abs(p.y)>SP*0.7)v.y*=-1;if(Math.abs(p.z)>SP*0.4)v.z*=-1;meshes[i].position.copy(p);meshes[i].material.opacity=0.4+0.3*Math.sin(t*0.7+pph)}
+        let idx=0;for(let a=0;a<N;a++)for(let b=a+1;b<N;b++){const d=pos[a].distanceTo(pos[b]);if(d<LD){lp[idx++]=pos[a].x;lp[idx++]=pos[a].y;lp[idx++]=pos[a].z;lp[idx++]=pos[b].x;lp[idx++]=pos[b].y;lp[idx++]=pos[b].z}}
+        lg.attributes.position.needsUpdate=true;lg.setDrawRange(0,idx/3);lm.material.opacity=0.12+0.08*Math.sin(t*0.25);renderer.render(scene,camera);
+    }
+    animate();
+})();
+</script>
+</body>
+</html>

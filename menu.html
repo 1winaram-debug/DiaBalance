@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Մենյուի Կազմում — DiaBalance</title>
+    <!-- Font Awesome & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --blue: #1a3c6e;
+            --blue-mid: #2563b0;
+            --teal: #0cbfb0;
+            --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5;
+            --gray-200: #e2e4ed;
+            --gray-500: #8a91a8;
+            --gray-800: #1e2235;
+            --red: #e05252;
+            --yellow: #fde74c;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Noto Sans Armenian', 'DM Sans', sans-serif; background: var(--bg); color: var(--gray-800); min-height: 100vh; }
+
+        /* Navbar */
+        .nav-bar { position: sticky; top: 0; z-index: 100; display: flex; alignItems: center; justify-content: space-between; padding: 0.85rem 2rem; background: rgba(255,255,255,0.97); border-bottom: 1px solid var(--gray-200); box-shadow: 0 2px 12px rgba(26,60,110,.06); backdrop-filter: blur(20px); gap: 1rem; flex-wrap: wrap; }
+        .logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--blue); letter-spacing: -0.02em; text-decoration: none; }
+        .logo span { color: var(--teal); }
+        .nav-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        
+        .gen-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.3rem; background: linear-gradient(135deg, var(--teal) 0%, #0aada0 100%); color: #fff; border: none; border-radius: 100px; font-size: 0.85rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(12,191,176,0.35); transition: all 0.25s; letter-spacing: 0.01em; }
+        .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(12,191,176,0.45); }
+        
+        .nav-back-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1.4rem; background: var(--teal-soft); color: var(--blue) !important; border: 1px solid rgba(12,191,176,0.25); border-radius: 100px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-back-btn:hover { background: var(--teal); color: #ffffff !important; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(12,191,176,0.3); }
+
+        .main { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
+        .label { display: inline-flex; align-items: center; gap: 6px; background: var(--teal-soft); color: var(--teal); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; margin-bottom: 0.75rem; }
+        .page-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem,3vw,2.4rem); color: var(--blue); margin-bottom: 0.2rem; line-height: 1.15; margin-top: 0; }
+        .page-sub { font-size: 0.92rem; color: var(--gray-500); margin-bottom: 1.25rem; line-height: 1.6; }
+
+        /* Weekly Banner */
+        .week-banner { display: none; align-items: center; justify-content: space-between; background: linear-gradient(135deg, var(--teal-soft) 0%, rgba(37,99,176,0.08) 100%); border: 1px solid rgba(12,191,176,0.3); border-radius: 14px; padding: 0.85rem 1.2rem; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+        .week-banner.active { display: flex; }
+        .week-banner-text { font-size: 0.85rem; color: var(--blue); font-weight: 600; }
+        .week-banner-sub { font-size: 0.75rem; color: var(--gray-500); margin-top: 2px; }
+
+        /* Day Tabs */
+        .day-tabs-wrap { display: none; gap: 0.4rem; flex-wrap: wrap; background: var(--surface); padding: 0.65rem 1rem; border-radius: 14px; border: 1px solid var(--gray-200); margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(26,60,110,.04); align-items: center; }
+        .day-tabs-wrap.active { display: flex; }
+        .day-tab-label { font-size: 0.75rem; font-weight: 700; color: var(--gray-500); margin-right: 0.3rem; letter-spacing: 0.05em; }
+        .day-tab { padding: 0.42rem 0.9rem; border-radius: 100px; border: 1px solid var(--gray-200); background: var(--surface); color: var(--gray-800); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .day-tab.active { border-color: var(--teal); background: var(--teal); color: #fff; }
+        .day-tab:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
+        .day-tab-curr { margin-left: auto; }
+
+        .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; align-items: start; }
+        
+        .card { background: var(--surface); border: 1px solid var(--gray-200); border-radius: 22px; box-shadow: 0 4px 20px rgba(26,60,110,.06); overflow: hidden; }
+        .card-header { padding: 1.25rem 1.5rem 0.85rem; border-bottom: 1px solid var(--gray-100); }
+        .card-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--blue); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .card-subtitle { font-size: 0.76rem; color: var(--gray-500); margin-top: 4px; }
+        
+        .cat-tabs-wrap { display: flex; gap: 0.35rem; overflow-x: auto; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--gray-100); }
+        .cat-tab { padding: 0.38rem 0.85rem; border-radius: 100px; border: 1px solid var(--gray-200); background: var(--gray-100); color: var(--gray-800); font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .cat-tab.active { border-color: var(--blue); background: var(--blue); color: #fff; }
+        
+        .food-list-wrap { max-height: 520px; overflow-y: auto; padding: 0.75rem 1.25rem; }
+        
+        .food-card { background: var(--gray-100); border: 1.5px solid var(--gray-200); border-radius: 14px; padding: 0.7rem 0.9rem; margin-bottom: 0.55rem; cursor: grab; transition: all 0.2s; user-select: none; }
+        .food-card.dragging { background: var(--teal-soft); border-color: var(--teal); opacity: 0.7; transform: scale(0.98); box-shadow: 0 6px 20px rgba(12,191,176,0.2); }
+        .food-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.45rem; }
+        .food-title { font-size: 0.88rem; font-weight: 700; color: var(--blue); line-height: 1.3; }
+        
+        .gi-badge { font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+        .gi-low { background: rgba(12,191,176,0.12); color: var(--teal); }
+        .gi-medium { background: rgba(253,231,76,0.3); color: #9a7c00; }
+        .gi-high { background: rgba(224,82,82,0.12); color: var(--red); }
+        
+        .nutri-row { display: flex; gap: 10px; font-size: 0.74rem; color: var(--gray-500); margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .nutri-item { display: flex; gap: 3px; }
+        .nutri-item strong { color: var(--gray-800); }
+        .nutri-item strong.xe { color: var(--teal); }
+        
+        .add-btns-row { display: flex; gap: 5px; flex-wrap: wrap; }
+        .add-btn { padding: 0.3rem 0.7rem; background: var(--surface); border: 1px solid var(--gray-200); color: var(--blue); border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.18s; }
+        .add-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+        .right-col { display: flex; flex-direction: column; gap: 1rem; }
+        .meal-slots-container { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .meal-slot { background: var(--gray-100); border: 2px dashed var(--gray-200); border-radius: 16px; padding: 1rem 1.1rem; transition: all 0.22s; min-height: 80px; }
+        .meal-slot.drag-over { background: var(--teal-soft); border-color: var(--teal); }
+        .meal-slot-header { display: flex; align-items: center; gap: 7px; font-weight: 800; color: var(--blue); font-size: 0.9rem; margin-bottom: 0.6rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; }
+        .empty-text { font-size: 0.78rem; color: var(--gray-500); font-style: italic; text-align: center; padding: 0.5rem 0; }
+        
+        .selected-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--gray-200); border-radius: 9px; padding: 0.45rem 0.7rem; margin-bottom: 5px; font-size: 0.8rem; box-shadow: 0 1px 4px rgba(0,0,0,0.02); }
+        .remove-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1rem; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center; transition: transform 0.15s; line-height: 1; }
+        .remove-btn:hover { transform: scale(1.2); }
+
+        /* Summary Card */
+        .summary-card { background: linear-gradient(135deg, var(--blue) 0%, #1c4e8a 100%); border-radius: 20px; padding: 1.4rem 1.5rem; color: #fff; box-shadow: 0 12px 40px rgba(26,60,110,.22); }
+        .summary-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 7px; }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1rem; text-align: center; }
+        .metric-card { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 6px; border: 1px solid rgba(255,255,255,0.15); }
+        .metric-value { font-size: 1.55rem; font-weight: 800; color: var(--teal); line-height: 1.1; }
+        .metric-label { font-size: 0.67rem; color: rgba(255,255,255,0.7); margin-top: 4px; line-height: 1.3; }
+        
+        .advice-box { background: rgba(255,255,255,0.07); border-left: 4px solid var(--teal); padding: 0.75rem 1rem; font-size: 0.78rem; line-height: 1.55; border-radius: 0 10px 10px 0; color: rgba(255,255,255,0.88); margin-bottom: 1rem; }
+        
+        .actions-row { display: flex; gap: 8px; margin-top: 0.25rem; }
+        .print-btn { flex: 1; padding: 0.75rem; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
+        .print-btn:hover { background: #0aada0; transform: translateY(-2px); }
+        .clear-btn { flex: 1; padding: 0.75rem; background: rgba(255,255,255,0.13); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
+        .clear-btn:hover { background: rgba(255,255,255,0.22); }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--blue); color: #fff; padding: 0.75rem 1.3rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(26,60,110,.3); z-index: 999; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(.22,.87,.38,.99); opacity: 0; transform: translateY(12px); pointer-events: none; }
+        .toast.visible { opacity: 1; transform: translateY(0); }
+
+        /* Responsive overrides */
+        @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+        @media print { nav, .card:first-child, .actions-row { display: none !important; } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-500); border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <div class="nav-right">
+            <button class="gen-btn" id="gen-weekly-btn">✨ Ստեղծել շաբաթական մենյու</button>
+            <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+        </div>
+    </nav>
+
+    <div class="main">
+        <div class="label">🍽️ Սննդակարգի պլանավորում</div>
+        <h1 class="page-title">Օրական <span>Մենյուի</span> Ստեղծում</h1>
+        <p class="page-sub">Ընտրեք ցածր ԳԻ մթերքներ՝ քաշելով ճաշային բաժիններ, կամ ուղղակի սեղմեք կոճակները: Ավտոմատ հաշվարկ 24/7։</p>
+
+        <!-- Weekly Banner -->
+        <div class="week-banner" id="week-banner">
+            <div>
+                <div class="week-banner-text">📅 Շաբաթական մենյուն ստեղծված է</div>
+                <div class="week-banner-sub">Ընտրեք օրը՝ տեսնելու կամ խմբագրելու համար</div>
+            </div>
+            <button class="back-btn" id="close-weekly-btn" style="font-size: 0.78rem;">✕ Փակել</button>
+        </div>
+
+        <!-- Day Tabs -->
+        <div class="day-tabs-wrap" id="day-tabs">
+            <span class="day-tab-label">ՕՐ:</span>
+            <!-- Days injected via JS -->
+            <button class="day-tab day-tab-curr active" id="current-day-tab">📋 Ընթ.</button>
+        </div>
+
+        <div class="grid">
+            <!-- LEFT CATALOG -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🗂️ Ապրանքների Բազա</div>
+                    <div class="card-subtitle">Քաշեք ու բաց թողեք → ճաշային բաժին, կամ սեղմեք «+» կոճակը</div>
+                </div>
+                <div class="cat-tabs-wrap" id="cat-tabs">
+                    <!-- Categories injected via JS -->
+                </div>
+                <div class="food-list-wrap" id="food-list">
+                    <!-- Foods injected via JS -->
+                </div>
+            </div>
+
+            <!-- RIGHT SLOTS -->
+            <div class="right-col">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Իմ Մենյուն <span id="active-day-label" style="font-size:0.78rem; color:var(--teal); margin-left:8px; font-weight:600; display:none;"></span></div>
+                    </div>
+                    <div class="meal-slots-container" id="meal-slots">
+                        <!-- Meal slots injected via JS -->
+                    </div>
+                </div>
+
+                <!-- SUMMARY -->
+                <div class="summary-card">
+                    <div class="summary-title">🧮 Օրվա հաշվեկշիռը</div>
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-value" id="tot-carbs">0</div><div class="metric-label">Ածխաջրեր (գ)</div></div>
+                        <div class="metric-card"><div class="metric-value" id="tot-xe">0.0</div><div class="metric-label">Հացային Միավոր (XE)</div></div>
+                        <div class="metric-card"><div class="metric-value" id="tot-cal">0</div><div class="metric-label">Կալորիա (կկալ)</div></div>
+                    </div>
+                    <div class="advice-box" id="advice-box">Ավելացրեք մթերքներ՝ վերլուծություն ստանալու համար:</div>
+                    <div class="actions-row">
+                        <button class="print-btn" onclick="window.print()">🖨️ Տպել Մենյուն</button>
+                        <button class="clear-btn" id="clear-btn">🗑️ Մաքրել</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Data
+        const FOOD_DB = [
+            { id: 1, title: "Վարսակի շիլա ջրով", category: "grains", carbs: 12, calories: 68, gi: "low", xe: 1.0 },
+            { id: 2, title: "Հնդկաձավար եփած", category: "grains", carbs: 18, calories: 101, gi: "low", xe: 1.5 },
+            { id: 3, title: "Սպիտակ բրինձ եփած", category: "grains", carbs: 28, calories: 130, gi: "high", xe: 2.3 },
+            { id: 4, title: "Տարեկանի հաց (1 կտ.)", category: "grains", carbs: 12, calories: 65, gi: "low", xe: 1.0 },
+            { id: 5, title: "Սպիտակ հաց (1 կտ.)", category: "grains", carbs: 15, calories: 80, gi: "high", xe: 1.25 },
+            { id: 6, title: "Սպանախ թարմ", category: "vegetables", carbs: 1, calories: 23, gi: "low", xe: 0.1 },
+            { id: 7, title: "Բրոկոլի շոգեխաշ.", category: "vegetables", carbs: 4, calories: 35, gi: "low", xe: 0.3 },
+            { id: 8, title: "Կարտոֆիլ խաշած", category: "vegetables", carbs: 16, calories: 82, gi: "high", xe: 1.3 },
+            { id: 9, title: "Լոլիկ թարմ", category: "vegetables", carbs: 3, calories: 18, gi: "low", xe: 0.25 },
+            { id: 10, title: "Վարունգ թարմ", category: "vegetables", carbs: 2, calories: 15, gi: "low", xe: 0.15 },
+            { id: 11, title: "Հավի կրծ. խաշած", category: "proteins", carbs: 0, calories: 110, gi: "low", xe: 0 },
+            { id: 12, title: "Ձու խաշած (1 հ.)", category: "proteins", carbs: 0.5, calories: 75, gi: "low", xe: 0.04 },
+            { id: 13, title: "Ձկ. ֆիլե շոգ.", category: "proteins", carbs: 0, calories: 95, gi: "low", xe: 0 },
+            { id: 14, title: "Տավ. անյ. միս", category: "proteins", carbs: 0, calories: 150, gi: "low", xe: 0 },
+            { id: 15, title: "Կանաչ խնձոր (1 հ.)", category: "fruits", carbs: 10, calories: 52, gi: "low", xe: 0.8 },
+            { id: 16, title: "Նարինջ (1 հ.)", category: "fruits", carbs: 11, calories: 47, gi: "low", xe: 0.9 },
+            { id: 17, title: "Բանան (1 հ.)", category: "fruits", carbs: 22, calories: 89, gi: "medium", xe: 1.8 },
+            { id: 18, title: "Դեղձ (1 հ.)", category: "fruits", carbs: 9, calories: 39, gi: "low", xe: 0.75 },
+            { id: 19, title: "Անյուղ կաթնաշոռ", category: "dairy", carbs: 2, calories: 85, gi: "low", xe: 0.16 },
+            { id: 20, title: "Կեֆիր 1% (1 բ.)", category: "dairy", carbs: 8, calories: 100, gi: "low", xe: 0.65 },
+            { id: 21, title: "Յոգուրտ անհ.", category: "dairy", carbs: 6, calories: 75, gi: "low", xe: 0.5 },
+        ];
+
+        const CATEGORIES = [
+            { key: "all", label: "Բոլորը" },
+            { key: "vegetables", label: "Բանջ." },
+            { key: "grains", label: "Հացահ." },
+            { key: "proteins", label: "Սպիտ." },
+            { key: "fruits", label: "Մրգեր" },
+            { key: "dairy", label: "Կաթն." }
+        ];
+
+        const DAYS_HY = ["Երկ", "Երք", "Չոր", "Հնգ", "Ուրբ", "Շբթ", "Կիր"];
+        const MEAL_SLOTS = [
+            { key: "breakfast", label: "Նախաճաշ", icon: "☕" },
+            { key: "lunch", label: "Ճաշ", icon: "🥣" },
+            { key: "dinner", label: "Ընթրիք", icon: "🍽️" },
+            { key: "snacks", label: "Միջանկյալ", icon: "🍎" }
+        ];
+
+        // State
+        let state = {
+            category: "all",
+            activeDay: null,
+            currentPlan: { breakfast: [], lunch: [], dinner: [], snacks: [] },
+            weeklyPlan: null,
+            draggedFoodId: null
+        };
+
+        // DOM Elements
+        const elCatTabs = document.getElementById("cat-tabs");
+        const elFoodList = document.getElementById("food-list");
+        const elMealSlots = document.getElementById("meal-slots");
+        const elTotCarbs = document.getElementById("tot-carbs");
+        const elTotXe = document.getElementById("tot-xe");
+        const elTotCal = document.getElementById("tot-cal");
+        const elAdviceBox = document.getElementById("advice-box");
+        const elToast = document.getElementById("toast");
+        const elGenWeeklyBtn = document.getElementById("gen-weekly-btn");
+        const elCloseWeeklyBtn = document.getElementById("close-weekly-btn");
+        const elWeekBanner = document.getElementById("week-banner");
+        const elDayTabs = document.getElementById("day-tabs");
+        const elActiveDayLabel = document.getElementById("active-day-label");
+        const elClearBtn = document.getElementById("clear-btn");
+        const elCurrentDayTab = document.getElementById("current-day-tab");
+
+        let toastTimer = null;
+        function showToast(msg) {
+            elToast.textContent = msg;
+            elToast.classList.add("visible");
+            if(toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => elToast.classList.remove("visible"), 2500);
+        }
+
+        function generateWeeklyMenu() {
+            const weekly = {};
+            DAYS_HY.forEach((_, di) => {
+                const day = {};
+                MEAL_SLOTS.forEach(({ key }) => {
+                    let pool = [];
+                    if (key === "breakfast") pool = FOOD_DB.filter(f => ["grains", "dairy"].includes(f.category));
+                    else if (key === "lunch") pool = FOOD_DB.filter(f => ["proteins", "vegetables"].includes(f.category));
+                    else if (key === "dinner") pool = FOOD_DB.filter(f => ["proteins", "vegetables", "grains"].includes(f.category));
+                    else pool = FOOD_DB.filter(f => ["fruits", "dairy"].includes(f.category));
+                    
+                    const lowGI = pool.filter(f => f.gi === "low");
+                    const src = lowGI.length >= 2 ? lowGI : pool;
+                    const shuffled = [...src].sort(() => Math.random() - 0.5);
+                    const count = key === "snacks" ? 1 : 2;
+                    day[key] = shuffled.slice(0, count).map(f => ({ ...f, uid: `${di}-${key}-${f.id}-${Math.random().toString(36).slice(2,6)}` }));
+                });
+                weekly[di] = day;
+            });
+            return weekly;
+        }
+
+        function getDisplayPlan() {
+            return (state.activeDay !== null && state.weeklyPlan) ? state.weeklyPlan[state.activeDay] : state.currentPlan;
+        }
+
+        function setDisplayPlan(newPlan) {
+            if (state.activeDay !== null && state.weeklyPlan) {
+                state.weeklyPlan[state.activeDay] = newPlan;
+            } else {
+                state.currentPlan = newPlan;
+            }
+            renderMealSlots();
+            renderSummary();
+        }
+
+        function addFoodToMeal(food, mealKey) {
+            const item = { ...food, uid: `${food.id}-${Date.now()}-${Math.random().toString(36).slice(2,5)}` };
+            const plan = getDisplayPlan();
+            plan[mealKey].push(item);
+            setDisplayPlan(plan);
+            showToast(`✅ ${food.title} → ${MEAL_SLOTS.find(s=>s.key===mealKey).label}`);
+        }
+
+        function removeFoodFromMeal(mealKey, uid) {
+            const plan = getDisplayPlan();
+            plan[mealKey] = plan[mealKey].filter(i => i.uid !== uid);
+            setDisplayPlan(plan);
+        }
+
+        // Render Functions
+        function renderCatTabs() {
+            elCatTabs.innerHTML = "";
+            CATEGORIES.forEach(c => {
+                const btn = document.createElement("button");
+                btn.className = `cat-tab ${state.category === c.key ? "active" : ""}`;
+                btn.textContent = c.label;
+                btn.onclick = () => { state.category = c.key; renderCatTabs(); renderFoodList(); };
+                elCatTabs.appendChild(btn);
+            });
+        }
+
+        function renderFoodList() {
+            elFoodList.innerHTML = "";
+            const filteredFoods = state.category === "all" ? FOOD_DB : FOOD_DB.filter(f => f.category === state.category);
+            
+            filteredFoods.forEach(food => {
+                const giLabel = food.gi === "low" ? "Ցածր ԳԻ" : food.gi === "medium" ? "Միջ. ԳԻ" : "Բարձր ԳԻ";
+                const giClass = `gi-${food.gi}`;
+                
+                const card = document.createElement("div");
+                card.className = "food-card";
+                card.draggable = true;
+                
+                card.ondragstart = (e) => {
+                    state.draggedFoodId = food.id;
+                    card.classList.add("dragging");
+                    e.dataTransfer.setData("text/plain", food.id);
+                };
+                card.ondragend = () => {
+                    card.classList.remove("dragging");
+                    state.draggedFoodId = null;
+                };
+
+                let btnsHtml = "";
+                MEAL_SLOTS.forEach(slot => {
+                    btnsHtml += `<button class="add-btn" data-meal="${slot.key}">${slot.key === "snacks" ? "+Միջ." : slot.label}</button>`;
+                });
+
+                card.innerHTML = `
+                    <div class="food-card-top">
+                        <span class="food-title">${food.title}</span>
+                        <span class="gi-badge ${giClass}">${giLabel}</span>
+                    </div>
+                    <div class="nutri-row">
+                        <span class="nutri-item">🔥 <strong>${food.calories}</strong> կկ</span>
+                        <span class="nutri-item">🍞 <strong>${food.carbs}գ</strong></span>
+                        <span class="nutri-item">XE: <strong class="xe">${food.xe}</strong></span>
+                    </div>
+                    <div class="add-btns-row">${btnsHtml}</div>
+                `;
+
+                card.querySelectorAll(".add-btn").forEach(btn => {
+                    btn.onclick = () => addFoodToMeal(food, btn.dataset.meal);
+                });
+
+                elFoodList.appendChild(card);
+            });
+        }
+
+        function renderMealSlots() {
+            elMealSlots.innerHTML = "";
+            const plan = getDisplayPlan();
+
+            MEAL_SLOTS.forEach(slot => {
+                const slotDiv = document.createElement("div");
+                slotDiv.className = "meal-slot";
+                
+                slotDiv.ondragover = (e) => { e.preventDefault(); slotDiv.classList.add("drag-over"); };
+                slotDiv.ondragleave = () => { slotDiv.classList.remove("drag-over"); };
+                slotDiv.ondrop = (e) => {
+                    e.preventDefault();
+                    slotDiv.classList.remove("drag-over");
+                    const foodId = parseInt(e.dataTransfer.getData("text/plain"));
+                    if(foodId) {
+                        const food = FOOD_DB.find(f => f.id === foodId);
+                        if(food) addFoodToMeal(food, slot.key);
+                    }
+                };
+
+                let itemsHtml = "";
+                if(plan[slot.key].length === 0) {
+                    itemsHtml = `<div class="empty-text">Դատարկ է — քաշեք ու բաց թողեք</div>`;
+                } else {
+                    plan[slot.key].forEach(item => {
+                        itemsHtml += `
+                        <div class="selected-item">
+                            <span>
+                                <strong style="color: var(--blue)">${item.title}</strong>
+                                <span style="color: var(--gray-500); margin-left: 6px; font-size: 0.74rem;">
+                                    (${item.carbs}գ · ${item.calories}կկ · XE:${item.xe})
+                                </span>
+                            </span>
+                            <button class="remove-btn" data-uid="${item.uid}" data-meal="${slot.key}">✕</button>
+                        </div>`;
+                    });
+                }
+
+                slotDiv.innerHTML = `
+                    <div class="meal-slot-header">
+                        <span style="font-size: 1rem;">${slot.icon}</span> ${slot.label}
+                    </div>
+                    ${itemsHtml}
+                `;
+
+                slotDiv.querySelectorAll(".remove-btn").forEach(btn => {
+                    btn.onclick = () => removeFoodFromMeal(btn.dataset.meal, btn.dataset.uid);
+                });
+
+                elMealSlots.appendChild(slotDiv);
+            });
+        }
+
+        function renderSummary() {
+            const plan = getDisplayPlan();
+            let carbs = 0, cal = 0, xe = 0;
+            let hasHighGI = false;
+
+            Object.values(plan).forEach(items => {
+                items.forEach(item => {
+                    carbs += item.carbs;
+                    cal += item.calories;
+                    xe += item.xe;
+                    if(item.gi === "high") hasHighGI = true;
+                });
+            });
+
+            elTotCarbs.textContent = Math.round(carbs);
+            elTotXe.textContent = xe.toFixed(1);
+            elTotCal.textContent = Math.round(cal);
+
+            const xeOver = xe > 20;
+            
+            if(xe === 0) {
+                elAdviceBox.textContent = "Ավելացրեք մթերքներ՝ վերլուծություն ստանալու համար: Խորհուրդ է տրվում օրական չգերազանցել 15-20 XE-ն:";
+                elAdviceBox.style.borderLeftColor = "var(--teal)";
+            } else if(xeOver) {
+                elAdviceBox.textContent = `⚠️ XE-ն գերազանցում է 20-ը (${xe.toFixed(1)} XE): Կրճատեք ածխաջրերը:`;
+                elAdviceBox.style.borderLeftColor = "var(--red)";
+            } else if(hasHighGI) {
+                elAdviceBox.textContent = "⚠️ Կա բարձր ԳԻ-ով մթերք: Փոխարինեք հնդկաձավարով կամ տարեկանի հացով:";
+                elAdviceBox.style.borderLeftColor = "#f97316";
+            } else {
+                elAdviceBox.textContent = `✅ Մենյուն հավասարակշռված է: Բոլոր ցուցանիշները նորմայի մեջ են (${xe.toFixed(1)} XE):`;
+                elAdviceBox.style.borderLeftColor = "var(--teal)";
+            }
+        }
+
+        function renderDayTabs() {
+            if(!state.weeklyPlan) {
+                elWeekBanner.classList.remove("active");
+                elDayTabs.classList.remove("active");
+                elActiveDayLabel.style.display = "none";
+                return;
+            }
+            
+            elWeekBanner.classList.add("active");
+            elDayTabs.classList.add("active");
+            elActiveDayLabel.style.display = "inline";
+            elActiveDayLabel.textContent = `— ${DAYS_HY[state.activeDay]}`;
+
+            // clear existing days
+            Array.from(elDayTabs.querySelectorAll(".day-tab:not(.day-tab-curr)")).forEach(e => e.remove());
+
+            DAYS_HY.forEach((d, i) => {
+                const btn = document.createElement("button");
+                btn.className = `day-tab ${state.activeDay === i ? "active" : ""}`;
+                btn.textContent = d;
+                btn.onclick = () => {
+                    state.activeDay = i;
+                    renderDayTabs();
+                    renderMealSlots();
+                    renderSummary();
+                };
+                elDayTabs.insertBefore(btn, elCurrentDayTab);
+            });
+
+            elCurrentDayTab.className = `day-tab day-tab-curr ${state.activeDay === null ? "active" : ""}`;
+            elCurrentDayTab.onclick = () => {
+                state.activeDay = null;
+                elActiveDayLabel.style.display = "none";
+                renderDayTabs();
+                renderMealSlots();
+                renderSummary();
+            };
+        }
+
+        // Init
+        elGenWeeklyBtn.onclick = () => {
+            state.weeklyPlan = generateWeeklyMenu();
+            state.activeDay = 0;
+            renderDayTabs();
+            renderMealSlots();
+            renderSummary();
+            showToast("✨ Շաբաթական մենյուն ստեղծված է!");
+        };
+
+        elCloseWeeklyBtn.onclick = () => {
+            state.weeklyPlan = null;
+            state.activeDay = null;
+            renderDayTabs();
+            renderMealSlots();
+            renderSummary();
+        };
+
+        elClearBtn.onclick = () => {
+            setDisplayPlan({ breakfast: [], lunch: [], dinner: [], snacks: [] });
+            showToast("🗑️ Մենյուն մաքրված է");
+        };
+
+        renderCatTabs();
+        renderFoodList();
+        renderMealSlots();
+        renderSummary();
+        renderDayTabs();
+    </script>
+</body>
+</html>
