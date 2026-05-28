@@ -16,6 +16,8 @@
 
     <!-- AOS CSS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <!-- Mobile-first responsive overrides -->
+    <link rel="stylesheet" href="mobile.css" />
 
     <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -315,9 +317,9 @@
 
         .headline {
             font-family: 'DM Serif Display', serif;
-            font-size: clamp(3.2rem, 7.5vw, 6.2rem);
+            /* Font size handled by mobile.css responsive rules */
             font-weight: 700;
-            line-height: 1.05;
+            line-height: 1.1;
             color: var(--blue);
             margin-bottom: 1rem;
             letter-spacing: -0.01em;
@@ -893,80 +895,7 @@
             }
         }
 
-        /* ── Responsive Styling ── */
-        @media (max-width: 1024px) {
-            .tips-list {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .ds-cards {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .ds-accent-banner {
-                grid-column: span 2;
-            }
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                padding: 1rem 2rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .ds-intro-inner,
-            .ds-sym-inner {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-
-            .ds-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .ds-accent-banner {
-                grid-column: span 1;
-                flex-direction: column;
-                text-align: center;
-                gap: 1.5rem;
-            }
-
-            .tips-list {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .footer-inner {
-                flex-direction: column;
-                gap: 2rem;
-                text-align: center;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .tips-list {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                flex-direction: column;
-                gap: 1.5rem;
-                padding: 2rem;
-                border-radius: 30px;
-            }
-
-            .stat-divider {
-                width: 50px;
-                height: 1px;
-            }
-        }
+        /* ── Responsive Overrides handled by mobile.css ── */
     </style>
 </head>
 
@@ -1513,6 +1442,8 @@
             animate();
         })();
     </script>
+    <!-- Mobile burger nav -->
+    <script src="mobile-nav.js"></script>
 </body>
 
 </html>

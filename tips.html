@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+    <link rel="stylesheet" href="mobile.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
@@ -62,7 +63,7 @@
         .page-hero-badge{display:inline-flex;align-items:center;gap:.6rem;padding:.5rem 1.2rem;border:1px solid rgba(26,188,156,.35);border-radius:999px;background:var(--teal-dim);font-size:.8rem;font-weight:600;color:var(--teal);margin-bottom:1.6rem;backdrop-filter:blur(8px)}
         .page-hero-badge span{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:pulse 2s infinite}
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-        .page-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:700;line-height:1.15;margin-bottom:1.5rem}
+        .page-title{ /* font-size handled by mobile.css */ font-weight:700; line-height:1.15; margin-bottom:1.5rem}
         .page-title span{color:var(--teal);text-shadow:0 0 30px rgba(26,188,156,.5)}
         .page-subtitle{font-size:1.15rem;color:var(--white-dim);max-width:640px;margin:0 auto;line-height:1.8}
         .ds-label{display:inline-flex;align-items:center;gap:10px;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(26,188,156,.2);font-size:.85rem;font-weight:700;padding:8px 18px;border-radius:100px;margin-bottom:1.5rem;backdrop-filter:blur(10px)}
@@ -139,20 +140,7 @@
         footer{position:relative;z-index:10;text-align:center;padding:3rem;border-top:1px solid var(--glass-border);color:var(--white-dim);font-size:.9rem}
         footer a{color:var(--teal);text-decoration:none}
 
-        @media(max-width:1024px){
-            .b1{grid-column:1/8;min-height:380px}
-            .b2,.b3{grid-column:span 5}
-            .b4,.b5{grid-column:span 5}
-            .b6,.b7,.b8{grid-column:span 4}
-        }
-        @media(max-width:768px){
-            .bento-grid{display:flex;flex-direction:column}
-            .bento-card{min-height:280px !important}
-            .b1{min-height:360px !important}
-            .nutrition-grid{grid-template-columns:1fr}
-            nav{padding:1rem 1.5rem}
-            .nav-links{display:none}
-        }
+        /* Responsive handled by mobile.css */
     </style>
 </head>
 <body>
@@ -481,5 +469,6 @@ AOS.init({once:true,easing:'ease-out-cubic',offset:80});
     animate();
 })();
 </script>
+    <script src="mobile-nav.js"></script>
 </body>
 </html>

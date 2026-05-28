@@ -1,464 +1,219 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Դիաբետի մասին — DiaBalance</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Դիաբետի Մասին — DiaBalance</title>
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=Noto+Sans+Armenian:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="mobile.css">
     <style>
         :root {
             --bg: #f5f6fa;
             --surface: #ffffff;
             --blue: #1a3c6e;
-            --blue-mid: #2563b0;
             --teal: #0cbfb0;
             --teal-soft: #d0f5f2;
             --gray-100: #f0f1f5;
             --gray-200: #e2e4ed;
             --gray-500: #8a91a8;
             --gray-800: #1e2235;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; width: 100%;
+            font-family: 'Noto Sans Armenian', 'DM Sans', sans-serif;
+            background: var(--bg); color: var(--gray-800);
+            min-height: 100vh; scroll-behavior: smooth;
+        }
 
-            --deep-blue: var(--bg);
-            --navy: var(--surface);
-            --mid-blue: var(--blue-mid);
-            --teal-glow: rgba(12, 191, 176, 0.25);
-            --teal-dim: rgba(12, 191, 176, 0.12);
-            --white: var(--gray-800);
-            --white-dim: var(--gray-500);
-            --glass-bg: var(--surface);
-            --glass-border: var(--gray-200);
-            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
-            --radius-lg: 26px;
-            --radius-md: 18px;
-            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
-        }
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        html, body {
-            width:100%;
-            background: var(--deep-blue);
-            font-family: 'Noto Sans Armenian','DM Sans',sans-serif;
-            color: var(--white);
-            scroll-behavior: smooth;
-        }
-        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-        body::after {
-            content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            background-repeat:repeat; background-size:200px; opacity:0.6;
-        }
-        .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(245, 246, 250, 0.75) 100%); }
-
-        /* NAV */
+        /* Nav */
         nav {
-            position:fixed; top:0; left:0; right:0; z-index:50;
-            display:flex; align-items:center; justify-content:space-between;
-            padding:1.1rem 3rem;
-            background:rgba(255, 255, 255, 0.95);
-            backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-            border-bottom:1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.1rem 3rem; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--gray-200); box-shadow: 0 8px 32px rgba(26, 60, 110, .06);
         }
-        .logo { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:600; color:var(--blue); letter-spacing:0.05em; text-decoration:none; }
-        .logo span { color:var(--teal); }
-        
+        .logo { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 600; color: var(--blue); text-decoration: none; }
+        .logo span { color: var(--teal); }
         .nav-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 1.4rem;
-            background: var(--teal-soft);
-            color: var(--blue) !important;
-            border: 1px solid rgba(12, 191, 176, 0.25);
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            padding: 0.6rem 1.4rem; background: var(--teal-soft);
+            color: var(--blue) !important; border: 1px solid rgba(12, 191, 176, 0.25);
+            border-radius: 100px; font-size: 0.9rem; font-weight: 600; text-decoration: none;
             transition: all 0.3s ease;
         }
         .nav-back-btn:hover {
-            background: var(--teal);
-            color: #ffffff !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
+            background: var(--teal); color: #ffffff !important;
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
         }
-        .nav-links { display:flex; gap:2rem; list-style:none; }
-        .nav-links a {
-            font-size:0.9rem; font-weight:500; color:var(--white-dim);
-            text-decoration:none; transition:color 0.25s ease; position:relative;
-        }
-        .nav-links a::after {
-            content:''; position:absolute; bottom:-6px; left:0; right:0; height:2px;
-            background:var(--teal); transform:scaleX(0); transform-origin:left; transition:transform 0.3s ease;
-        }
-        .nav-links a:hover, .nav-links a.active { color:var(--white); }
-        .nav-links a:hover::after, .nav-links a.active::after { transform:scaleX(1); }
 
-        /* CONTENT */
-        .content-wrapper { position:relative; z-index:10; padding-top:80px; }
-        .wrap { max-width:1200px; margin:0 auto; padding:0 5%; }
-        .section-pad { padding:100px 0; }
+        /* Container */
+        .content-wrapper { padding-top: 120px; padding-bottom: 80px; max-width: 900px; margin: 0 auto; width: 90%; }
+        .page-title { text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-family: 'DM Serif Display', serif; color: var(--blue); margin-bottom: 1rem; margin-top:0;}
+        .page-title span { color: var(--teal); }
+        .page-subtitle { text-align: center; color: var(--gray-500); font-size: 1.1rem; margin-bottom: 3rem; line-height: 1.6; }
 
-        /* PAGE HERO */
-        .page-hero {
-            min-height:65vh; display:flex; align-items:center; justify-content:center;
-            text-align:center; padding:120px 5% 80px;
-            background:linear-gradient(180deg, rgba(13,27,42,0) 0%, rgba(13,27,42,0.8) 100%);
-        }
-        .page-hero-badge {
-            display:inline-flex; align-items:center; gap:0.6rem;
-            padding:0.5rem 1.2rem; border:1px solid rgba(26,188,156,0.35);
-            border-radius:999px; background:var(--teal-dim);
-            font-size:0.8rem; font-weight:600; color:var(--teal);
-            margin-bottom:1.6rem; backdrop-filter:blur(8px);
-        }
-        .page-hero-badge span { width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px var(--teal); animation:pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-        .page-title { font-size:clamp(2.8rem,6vw,5rem); font-weight:700; line-height:1.15; margin-bottom:1.5rem; }
-        .page-title span { color:var(--teal); text-shadow:0 0 30px rgba(26,188,156,0.5); }
-        .page-subtitle { font-size:1.2rem; color:var(--white-dim); max-width:600px; margin:0 auto; line-height:1.8; }
-
-        /* GLASS CARD */
-        .glass-card {
-            background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-            border:1px solid var(--glass-border); border-radius:var(--radius-lg);
-            box-shadow:var(--glass-shadow); transition:all var(--transition); position:relative; overflow:hidden;
-        }
-        .glass-card::before {
-            content:''; position:absolute; top:0; left:0; right:0; height:3px;
-            background:linear-gradient(90deg,#1e4d8c,var(--teal)); opacity:0; transition:opacity var(--transition);
-        }
-        .glass-card:hover { border-color:var(--teal); box-shadow:0 15px 50px rgba(26,188,156,0.2); }
-        .glass-card:hover::before { opacity:1; }
-
-        /* PHOTO STRIP */
-        .photo-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-bottom:5rem; }
-        .photo-card {
-            border-radius:var(--radius-md); overflow:hidden; position:relative; aspect-ratio:4/3;
-            box-shadow:var(--glass-shadow); transition:all var(--transition);
-        }
-        .photo-card:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 20px 50px rgba(26,188,156,0.3); }
-        .photo-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s ease; }
-        .photo-card:hover img { transform:scale(1.1); }
-        .photo-card-label {
-            position:absolute; bottom:0; left:0; right:0; padding:1.5rem 1.2rem 1rem;
-            background:linear-gradient(to top, rgba(13,27,42,0.95), transparent);
-            font-size:0.9rem; font-weight:600; color:var(--white);
-        }
-        .photo-card:first-child { grid-column:span 2; grid-row:span 2; aspect-ratio:unset; }
-        .photo-card:first-child { height:400px; }
-
-        /* DS LABEL */
-        .ds-label {
-            display:inline-flex; align-items:center; gap:10px;
-            background:var(--teal-dim); color:var(--teal);
-            border:1px solid rgba(26,188,156,0.2); font-size:0.85rem; font-weight:700;
-            padding:8px 18px; border-radius:100px; margin-bottom:1.5rem;
-            backdrop-filter:blur(10px); box-shadow:0 0 10px var(--teal-dim);
-        }
-        .ds-h2 { font-size:clamp(2rem,4vw,3rem); font-weight:700; color:var(--white); margin-bottom:1.5rem; line-height:1.2; }
-        .ds-sub { font-size:1.1rem; color:var(--white-dim); line-height:1.8; }
-
-        /* INFO GRID */
-        .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
-        .info-text { display:flex; flex-direction:column; gap:1.5rem; }
-        .info-text p { font-size:1.05rem; color:var(--white-dim); line-height:1.9; }
-        .info-image { border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 0 40px rgba(26,188,156,0.15); }
-        .info-image img { width:100%; height:400px; object-fit:cover; display:block; }
-
-        /* STAT PILLS */
-        .stat-pills { display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:2rem; }
-        .stat-pill {
-            padding:1.2rem 2rem; border-radius:16px; text-align:center;
-            background:var(--glass-bg); border:1px solid rgba(26,188,156,0.25);
-            backdrop-filter:blur(12px); flex:1 1 140px;
-        }
-        .stat-pill-num { display:block; font-size:2.2rem; font-weight:700; color:var(--teal); text-shadow:0 0 15px rgba(26,188,156,0.5); }
-        .stat-pill-lab { font-size:0.85rem; color:var(--white-dim); margin-top:0.3rem; }
-
-        /* ICON LIST */
-        .icon-list { display:flex; flex-direction:column; gap:1.2rem; }
-        .icon-item {
-            display:flex; align-items:flex-start; gap:1.5rem;
-            padding:1.5rem 2rem; border-radius:20px;
-            background:var(--glass-bg); border:1px solid var(--glass-border);
-            backdrop-filter:blur(12px); transition:all var(--transition);
-        }
-        .icon-item:hover { border-color:var(--teal); transform:translateX(8px); box-shadow:0 8px 30px rgba(26,188,156,0.15); }
-        .icon-item-ico { width:52px; height:52px; border-radius:16px; background:rgba(26,188,156,0.12); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; border:1px solid rgba(26,188,156,0.2); }
-        .icon-item-text strong { display:block; font-size:1.1rem; color:var(--white); margin-bottom:0.4rem; }
-        .icon-item-text p { font-size:0.95rem; color:var(--white-dim); line-height:1.6; }
-
-        /* INFOGRAPHIC CARDS */
-        .infographic-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
-        .infographic-card { padding:2.5rem 2rem; text-align:center; }
-        .infographic-card i { font-size:3.5rem; color:var(--teal); margin-bottom:1.5rem; filter:drop-shadow(0 0 15px rgba(26,188,156,0.5)); }
-        .infographic-card h3 { font-size:1.3rem; font-weight:600; color:var(--white); margin-bottom:0.8rem; }
-        .infographic-card p { font-size:0.95rem; color:var(--white-dim); line-height:1.7; }
-
-        /* SECTION DIVIDER */
-        .divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(26,188,156,0.3),transparent); margin:0; }
-
-        /* BACK BUTTON */
-        .back-btn {
-            display:inline-flex; align-items:center; gap:0.7rem; padding:0.8rem 1.8rem;
-            background:var(--teal-dim); border:1px solid rgba(26,188,156,0.3); color:var(--teal);
-            border-radius:100px; font-size:0.95rem; font-weight:600; text-decoration:none;
-            transition:all 0.3s ease; margin-bottom:2rem;
-        }
-        .back-btn:hover { background:var(--teal); color:var(--deep-blue); transform:translateX(-4px); }
-
-        /* FOOTER */
-        footer {
-            position:relative; z-index:10; text-align:center; padding:3rem;
-            border-top:1px solid var(--glass-border); color:var(--white-dim); font-size:0.9rem;
-        }
-        footer a { color:var(--teal); text-decoration:none; }
-
-        @media(max-width:960px) {
-            .info-grid { grid-template-columns:1fr; }
-            .photo-strip { grid-template-columns:1fr 1fr; }
-            .photo-card:first-child { grid-column:span 2; }
-            .infographic-grid { grid-template-columns:1fr 1fr; }
-        }
-        @media(max-width:640px) {
-            nav { padding:1rem 1.5rem; }
-            .nav-links { display:none; }
-            .photo-strip { grid-template-columns:1fr; }
-            .photo-card:first-child { grid-column:span 1; }
-            .infographic-grid { grid-template-columns:1fr; }
+        /* Accordion */
+        .accordion { background: var(--surface); border: 1px solid var(--gray-200); border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 8px 24px rgba(26, 60, 110, 0.04); overflow: hidden; transition: all 0.3s ease; }
+        .accordion:hover { border-color: var(--teal); box-shadow: 0 12px 32px rgba(12, 191, 176, 0.1); }
+        .acc-header { width: 100%; text-align: left; background: none; border: none; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--blue); font-size: 1.25rem; font-weight: 700; font-family: inherit; transition: background 0.3s; }
+        .acc-title-wrap { display: flex; align-items: center; gap: 1rem; }
+        .acc-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+        .acc-chevron { color: var(--gray-500); transition: transform 0.4s cubic-bezier(0.22,0.87,0.38,0.99); font-size: 1.2rem; }
+        .accordion.active .acc-chevron { transform: rotate(180deg); color: var(--teal); }
+        .accordion.active .acc-header { background: rgba(12, 191, 176, 0.04); }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.22,0.87,0.38,0.99); }
+        .acc-body { padding: 0 2rem 2rem 2rem; color: var(--gray-800); line-height: 1.7; font-size: 1.05rem; }
+        .acc-body h4 { color: var(--blue); margin: 1.5rem 0 0.5rem; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .acc-body p { margin-top: 0; margin-bottom: 1rem; }
+        .acc-body ul { list-style: none; padding-left: 0; margin-bottom: 1rem; }
+        .acc-body li { position: relative; padding-left: 1.5rem; margin-bottom: 0.6rem; }
+        .acc-body li::before { content: '•'; color: var(--teal); position: absolute; left: 0; font-weight: 900; font-size: 1.2rem; line-height: 1; }
+        
+        @media(max-width: 640px) {
+            nav { padding: 1rem 1.5rem; }
+            .acc-header { padding: 1.2rem 1.5rem; font-size: 1.1rem; }
+            .acc-body { padding: 0 1.5rem 1.5rem 1.5rem; }
         }
     </style>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
-<div class="vignette"></div>
 
-<nav id="navbar">
-    <a href="index.html" class="logo">Dia<span>Balance</span></a>
-    <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
-</nav>
+    <nav id="navbar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+    </nav>
 
-<div class="content-wrapper">
+    <div class="content-wrapper">
+        <h1 class="page-title">Դիաբետի <span>Մասին</span></h1>
+        <p class="page-subtitle">Հիմնարար տեղեկություններ շաքարային դիաբետի էության, ինսուլինի դերի և ժամանակին ախտորոշման կարևորության մասին:</p>
 
-    <!-- PAGE HERO -->
-    <div class="page-hero">
-        <div>
-            <div class="page-hero-badge" data-aos="fade-down"><span></span> Բժշկական ուղեցույց</div>
-            <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Ամեն ինչ <span>Դիաբետի</span> մասին</h1>
-            <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Բացահայտեք շաքարային դիաբետի էությունը, առաջացման պատճառները, ռիսկային գործոնները և արդյունավետ կառավարման ուղիները:</p>
+        <!-- Accordion 1 -->
+        <div class="accordion">
+            <button class="acc-header">
+                <div class="acc-title-wrap">
+                    <div class="acc-icon"><i class="fa-solid fa-circle-question"></i></div>
+                    <span>Ի՞նչ է շաքարային դիաբետը</span>
+                </div>
+                <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </button>
+            <div class="acc-content">
+                <div class="acc-body">
+                    <p><strong>Շաքարային դիաբետը</strong> քրոնիկական հիվանդություն է, որն առաջանում է, երբ ենթաստամոքսային գեղձը չի արտադրում բավարար քանակությամբ ինսուլին, կամ երբ օրգանիզմը չի կարողանում արդյունավետորեն օգտագործել իր արտադրած ինսուլինը:</p>
+                    
+                    <h4><i class="fa-solid fa-droplet"></i> Արյան Շաքար (Գլյուկոզա)</h4>
+                    <p>Մեր օրգանիզմը սննդից ստացած ածխաջրերը վերածում է գլյուկոզայի, որն արյան միջոցով տեղափոխվում է բջիջներ և ծառայում որպես էներգիայի հիմնական աղբյուր: Դիաբետի դեպքում գլյուկոզան չի կարողանում մուտք գործել բջիջներ և կուտակվում է արյան մեջ՝ հանգեցնելով վտանգավոր բարդությունների (հիպերգլիկեմիա):</p>
+                </div>
+            </div>
         </div>
+
+        <!-- Accordion 2 -->
+        <div class="accordion">
+            <button class="acc-header">
+                <div class="acc-title-wrap">
+                    <div class="acc-icon"><i class="fa-solid fa-key"></i></div>
+                    <span>Ինչպե՞ս է աշխատում ինսուլինը</span>
+                </div>
+                <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </button>
+            <div class="acc-content">
+                <div class="acc-body">
+                    <p><strong>Ինսուլինը</strong> հորմոն է, որն արտադրվում է ենթաստամոքսային գեղձի (պանկրեասի) բետա-բջիջների կողմից:</p>
+                    
+                    <h4><i class="fa-solid fa-unlock-keyhole"></i> Բանալի բջիջների համար</h4>
+                    <p>Պատկերացրեք ինսուլինը որպես "բանալի", որը բացում է բջիջների դռները՝ թույլ տալով, որ արյան մեջ եղած գլյուկոզան ներթափանցի այնտեղ: Առանց այդ բանալու, գլյուկոզան մնում է փակված դրսում (արյան մեջ), իսկ բջիջները "սոված" են մնում և չեն ստանում անհրաժեշտ էներգիան:</p>
+                    <p>Այդ իսկ պատճառով, դիաբետով հիվանդները մշտապես քաղց և հոգնածություն են զգում, չնայած արյան մեջ շաքարի ավելցուկին:</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 3 -->
+        <div class="accordion">
+            <button class="acc-header">
+                <div class="acc-title-wrap">
+                    <div class="acc-icon"><i class="fa-solid fa-list-ul"></i></div>
+                    <span>Ընդհանուր նշաններն ու ախտանիշները</span>
+                </div>
+                <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </button>
+            <div class="acc-content">
+                <div class="acc-body">
+                    <p>Շաքարային դիաբետի վաղ բացահայտումը շատ կարևոր է: Հիմնական նախազգուշացնող նշաններն են՝</p>
+                    <ul>
+                        <li><strong>Հաճախակի միզարձակում:</strong> Օրգանիզմը փորձում է ազատվել ավելցուկային շաքարից մեզի միջոցով:</li>
+                        <li><strong>Անհագ ծարավ:</strong> Հաճախակի միզարձակման պատճառով օրգանիզմը ջրազրկվում է և մշտապես հեղուկ է պահանջում:</li>
+                        <li><strong>Անբացատրելի քաշի կորուստ:</strong> Երբ բջիջները չեն ստանում էներգիա գլյուկոզայից, օրգանիզմը սկսում է այրել սեփական ճարպն ու մկանները:</li>
+                        <li><strong>Մշտական հոգնածություն:</strong> Էներգիայի պակասի ուղիղ հետևանքը:</li>
+                        <li><strong>Տեսողության վատթարացում:</strong> Արյան մեջ շաքարի բարձր մակարդակը քաշում է հեղուկը աչքի ոսպնյակից՝ դժվարացնելով ֆոկուսավորումը:</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 4 -->
+        <div class="accordion">
+            <button class="acc-header">
+                <div class="acc-title-wrap">
+                    <div class="acc-icon"><i class="fa-solid fa-stethoscope"></i></div>
+                    <span>Ախտորոշում և Վերահսկում</span>
+                </div>
+                <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </button>
+            <div class="acc-content">
+                <div class="acc-body">
+                    <p>Դիաբետը հաստատվում է արյան և մեզի լաբորատոր թեստերի միջոցով:</p>
+                    
+                    <h4><i class="fa-solid fa-vial"></i> Հիմնական թեստերը</h4>
+                    <ul>
+                        <li><strong>Քաղցած ժամանակ արյան գլյուկոզայի թեստ (FPG):</strong> Չափվում է նախաճաշից առաջ: ≥ 7.0 մմոլ/լ արդյունքը վկայում է դիաբետի մասին:</li>
+                        <li><strong>Գլիկոզիլացված հեմոգլոբին (HbA1c):</strong> Ցույց է տալիս արյան շաքարի միջին մակարդակը վերջին 2-3 ամիսների ընթացքում: ≥ 6.5% արդյունքը ախտորոշիչ է:</li>
+                        <li><strong>Գլյուկոզայի տոլերանտության թեստ (OGTT):</strong> Ստուգում է օրգանիզմի արձագանքը գլյուկոզայի մեծ չափաբաժնին:</li>
+                    </ul>
+
+                    <h4><i class="fa-solid fa-heart-pulse"></i> Բարդությունների Կանխարգելում</h4>
+                    <p>Դիաբետի ժամանակին և գրագետ վերահսկումը կանխում է լուրջ բարդություններ, ինչպիսիք են՝ սրտանոթային հիվանդությունները, երիկամների անբավարարությունը, կուրությունը և նյարդերի վնասումը: Պահպանեք բժշկի ցուցումները և վարեք ակտիվ կյանք:</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="wrap">
+    <script src="mobile-nav.js"></script>
+    <script>
+        // Vanilla JS Accordion Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const accordions = document.querySelectorAll('.accordion');
 
-        <!-- PHOTO STRIP -->
-        <div class="photo-strip" data-aos="fade-up">
-            <div class="photo-card">
-                <img src="https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=800&q=80&fit=crop" alt="Diabetes care" loading="lazy"/>
-                <div class="photo-card-label">Ժամանակակից բժշկություն</div>
-            </div>
-            <div class="photo-card">
-                <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80&fit=crop" alt="blood glucose" loading="lazy"/>
-                <div class="photo-card-label">Գլյուկոզայի մոնիտորինգ</div>
-            </div>
-            <div class="photo-card">
-                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80&fit=crop" alt="healthy food" loading="lazy"/>
-                <div class="photo-card-label">Առողջ սնուցում</div>
-            </div>
-            <div class="photo-card">
-                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80&fit=crop" alt="exercise" loading="lazy"/>
-                <div class="photo-card-label">Ֆիզիկական ակտիվություն</div>
-            </div>
-            <div class="photo-card">
-                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&fit=crop" alt="doctor patient" loading="lazy"/>
-                <div class="photo-card-label">Բժշկական հսկողություն</div>
-            </div>
-        </div>
+            accordions.forEach(acc => {
+                const header = acc.querySelector('.acc-header');
+                const content = acc.querySelector('.acc-content');
 
-        <!-- SECTION 1: WHAT IS DIABETES -->
-        <section class="section-pad">
-            <div class="info-grid">
-                <div class="info-text" data-aos="fade-right" data-aos-duration="900">
-                    <div class="ds-label"><i class="fa-solid fa-circle-info"></i> Սահմանում</div>
-                    <h2 class="ds-h2">Ի՞նչ է շաքարային դիաբետը</h2>
-                    <p>Շաքարային դիաբետը (Diabetes Mellitus) քրոնիկ նյութափոխանակային հիվանդություն է, որի դեպքում արյան մեջ գլյուկոզայի մակարդակը մնում է կայուն բարձր։ Սա տեղի է ունենում, երբ ենթաստամոքսային գեղձը չի կարողանում արտադրել բավարար քանակությամբ ինսուլին, կամ օրգանիզմն արդյունավետորեն չի կարողանում օգտագործել արտադրված ինսուլինը:</p>
-                    <p>Ինսուլինը հորմոն է, որն օգնում է գլյուկոզային ներթափանցել բջիջներ և ապահովել դրանք էներգիայով: Եթե այս գործընթացը խանգարվում է, գլյուկոզան կուտակվում է արյան մեջ, ինչը ժամանակի ընթացքում զգալի վնաս է հասցնում օրգանիզմի բազմաթիվ համակարգերին:</p>
-                    <div class="stat-pills">
-                        <div class="stat-pill"><span class="stat-pill-num" data-count="537">0</span><div class="stat-pill-lab">մլն հիվանդ աշխարհում</div></div>
-                        <div class="stat-pill"><span class="stat-pill-num" data-count="90">0</span><div class="stat-pill-lab">%՝ 2-րդ տիպ</div></div>
-                        <div class="stat-pill"><span class="stat-pill-num">50%</span><div class="stat-pill-lab">չգիտի իր ախտորոշման մասին</div></div>
-                    </div>
-                </div>
-                <div class="info-image" data-aos="fade-left" data-aos-duration="900" data-aos-delay="200">
-                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80&fit=crop" alt="Diabetes medical" loading="lazy" />
-                </div>
-            </div>
-        </section>
+                header.addEventListener('click', () => {
+                    const isActive = acc.classList.contains('active');
+                    
+                    accordions.forEach(a => {
+                        a.classList.remove('active');
+                        a.querySelector('.acc-content').style.maxHeight = null;
+                    });
 
-        <div class="divider"></div>
+                    if (!isActive) {
+                        acc.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
 
-        <!-- SECTION 2: INFOGRAPHIC - CAUSES -->
-        <section class="section-pad" id="causes">
-            <div style="text-align:center;margin-bottom:4rem;" data-aos="fade-up">
-                <div class="ds-label"><i class="fa-solid fa-magnifying-glass"></i> Պատճառները</div>
-                <h2 class="ds-h2">Ինչո՞ւ է առաջանում դիաբետը</h2>
-            </div>
-            <div class="infographic-grid">
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="0">
-                    <i class="fa-solid fa-dna"></i>
-                    <h3>Գենետիկ նախատրամադրվածություն</h3>
-                    <p>Ընտանիքում հիվանդության առկայությունը զգալիորեն բարձրացնում է հատկապես 2-րդ տիպի դիաբետի զարգացման ռիսկը:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="150">
-                    <i class="fa-solid fa-burger"></i>
-                    <h3>Ոչ առողջ ապրելակերպ</h3>
-                    <p>Ավելորդ քաշը, պարզ ածխաջրերով հարուստ սնունդը և նստակյաց ակտիվությունը 2-րդ տիպի դիաբետի հիմնական գործոններն են:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="300">
-                    <i class="fa-solid fa-shield-virus"></i>
-                    <h3>Աուտոիմուն խանգարումներ</h3>
-                    <p>1-ին տիպի դիաբետի դեպքում իմունային համակարգը սխալմամբ հարձակվում է ենթաստամոքսային գեղձի ինսուլին արտադրող բջիջների վրա:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="450">
-                    <i class="fa-solid fa-person-pregnant"></i>
-                    <h3>Հղիություն</h3>
-                    <p>Հղիության ընթացքում հորմոնալ մեծ փոփոխությունները կարող են առաջացնել ինսուլինառեզիստենտություն և հանգեցնել գեստացիոն դիաբետի:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="600">
-                    <i class="fa-solid fa-brain"></i>
-                    <h3>Քրոնիկ սթրես</h3>
-                    <p>Սթրեսի հորմոնները (կորտիզոլ, ադրենալին) բարձրացնում են արյան գլյուկոզան և խափանում ինսուլինի ճիշտ կլանումը:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="fade-up" data-aos-delay="750">
-                    <i class="fa-solid fa-pills"></i>
-                    <h3>Որոշ դեղամիջոցներ</h3>
-                    <p>Հորմոնալ կամ հատուկ ստերոիդային որոշ դեղերի երկարատև ընդունումը կարող է ժամանակավոր կամ մշտական ազդեցություն ունենալ արյան շաքարի վրա:</p>
-                </div>
-            </div>
-        </section>
-
-        <div class="divider"></div>
-
-        <!-- SECTION 3: WHO IS AT RISK -->
-        <section class="section-pad" id="risk">
-            <div class="info-grid">
-                <div class="info-image" data-aos="fade-right" data-aos-duration="900">
-                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&fit=crop" alt="Doctor consulting patient" loading="lazy" />
-                </div>
-                <div data-aos="fade-left" data-aos-duration="900" data-aos-delay="200">
-                    <div class="ds-label"><i class="fa-solid fa-user-shield"></i> Ռիսկային խմբեր</div>
-                    <h2 class="ds-h2">Ովքե՞ր են գտնվում ռիսկի գոտում</h2>
-                    <div class="icon-list" style="margin-top:1.5rem;">
-                        <div class="icon-item">
-                            <div class="icon-item-ico"><i class="fa-solid fa-calendar"></i></div>
-                            <div class="icon-item-text"><strong>45 և ավելի բարձր տարիք</strong><p>Տարիքի հետ 2-րդ տիպի դիաբետի զարգացման ռիսկն էապես աճում է:</p></div>
-                        </div>
-                        <div class="icon-item">
-                            <div class="icon-item-ico"><i class="fa-solid fa-weight-scale"></i></div>
-                            <div class="icon-item-text"><strong>Ավելորդ քաշ և ճարպակալում</strong><p>Մարմնի զանգվածի ցուցիչի (BMI) 25-ից բարձր լինելը հիմնական նախադրյալն է:</p></div>
-                        </div>
-                        <div class="icon-item">
-                            <div class="icon-item-ico"><i class="fa-solid fa-couch"></i></div>
-                            <div class="icon-item-text"><strong>Նստակյաց ապրելակերպ</strong><p>Ֆիզիկական ակտիվության պակասը նպաստում է ինսուլինառեզիստենտությանը և նյութափոխանակության դանդաղմանը:</p></div>
-                        </div>
-                        <div class="icon-item">
-                            <div class="icon-item-ico"><i class="fa-solid fa-heart-crack"></i></div>
-                            <div class="icon-item-text"><strong>Սրտանոթային խնդիրներ</strong><p>Զարկերակային բարձր ճնշումը և բարձր խոլեստերինը փոխկապակցված են դիաբետի հետ:</p></div>
-                        </div>
-                        <div class="icon-item">
-                            <div class="icon-item-ico"><i class="fa-solid fa-users"></i></div>
-                            <div class="icon-item-text"><strong>Ժառանգականություն</strong><p>Արյունակից բարեկամների մոտ հիվանդության առկայությունը խոցելի է դարձնում անհատին զենետիկ դաշտում:</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="divider"></div>
-
-        <!-- SECTION 4: COMPLICATIONS -->
-        <section class="section-pad" id="complications">
-            <div style="text-align:center;margin-bottom:4rem;" data-aos="fade-up">
-                <div class="ds-label"><i class="fa-solid fa-triangle-exclamation"></i> Բարդություններ</div>
-                <h2 class="ds-h2">Չվերահսկվող դիաբետի հետևանքները</h2>
-                <p class="ds-sub" style="margin:0 auto;">Գլյուկոզայի մշտական բարձր մակարդակն աստիճանաբար քայքայում է օրգանիզմի անոթներն ու նյարդերը:</p>
-            </div>
-            <div class="infographic-grid">
-                <div class="glass-card infographic-card" data-aos="zoom-in" data-aos-delay="0">
-                    <i class="fa-solid fa-eye" style="color:#5bc0eb;"></i>
-                    <h3>Ռետինոպաթիա</h3>
-                    <p>Աչքի ցանցաթաղանթի մանր անոթների վնասում, որը կարող է հանգեցնել տեսողության վատթարացման կամ լիակատար կուրության:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="zoom-in" data-aos-delay="150">
-                    <i class="fa-solid fa-kidneys" style="color:#fde74c;"></i>
-                    <h3>Նեֆրոպաթիա</h3>
-                    <p>Երիկամների ֆիլտրման ֆունկցիայի խանգարում խրոնիկ նեֆրոպաթիայով, ինչը կարող է պահանջել դիալիզ:</p>
-                </div>
-                <div class="glass-card infographic-card" data-aos="zoom-in" data-aos-delay="300">
-                     // THREE.JS
-    (function(){
-        const canvas = document.getElementById('bg-canvas');
-        const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000,0);
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-        camera.position.z = 38;
-        scene.fog = new THREE.FogExp2(0xf5f6fa, 0.022);
-        const TEAL = new THREE.Color(0x0cbfb0), BLUE = new THREE.Color(0x2563b0), GRAY = new THREE.Color(0xc0c8d8);
-        const N=55, SP=22, LD=9, pos=[], meshes=[], vel=[], ph[];
-        const sg = new THREE.SphereGeometry(1,12,12);
-        for(let i=0;i<N;i++){
-            const p=new THREE.Vector3((Math.random()-.5)*SP*2,(Math.random()-.5)*SP*1.3,(Math.random()-.5)*SP*0.7);
-            pos.push(p); ph.push(Math.random()*Math.PI*2);
-            const t=Math.random(); const c=t<0.4?TEAL.clone():t<0.75?BLUE.clone().lerp(TEAL,0.3):GRAY.clone();
-            const r=0.08+Math.random()*0.28;
-            const m=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.6}));
-            m.scale.setScalar(r); m.position.copy(p); scene.add(m); meshes.push(m);
-            vel.push(new THREE.Vector3((Math.random()-.5)*0.008,(Math.random()-.5)*0.008,(Math.random()-.5)*0.004));
-        }
-        const lg=new THREE.BufferGeometry(), max=N*(N-1)/2, lp=new Float32Array(max*2*3);
-        lg.setAttribute('position',new THREE.BufferAttribute(lp,3));
-        const lm=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x0cbfb0,transparent:true,opacity:0.1}));
-        scene.add(lm);
-        const mouse=new THREE.Vector2(0,0);
-        window.addEventListener('mousemove',e=>{mouse.x=(e.clientX/window.innerWidth-.5)*2;mouse.y=(e.clientY/window.innerHeight-.5)*2;});
-        window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-        const clock=new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);
-            const t=clock.getElapsedTime();
-            camera.position.x+=(mouse.x*4-camera.position.x)*0.03;
-            camera.position.y+=(-mouse.y*3-camera.position.y)*0.03;
-            camera.lookAt(scene.position);
-            for(let i=0;i<N;i++){
-                const v=vel[i],p=pos[i],pph=ph[i];
-                p.x+=v.x+Math.cos(t*0.3+pph)*0.01;
-                p.y+=v.y+Math.sin(t*0.4+pph)*0.015;
-                p.z+=v.z;
-                if(Math.abs(p.x)>SP)v.x*=-1;
-                if(Math.abs(p.y)>SP*0.7)v.y*=-1;
-                if(Math.abs(p.z)>SP*0.4)v.z*=-1;
-                meshes[i].position.copy(p);
-                meshes[i].material.opacity=0.35+0.25*Math.sin(t*0.7+pph);
+            if(accordions.length > 0) {
+                accordions[0].classList.add('active');
+                const firstContent = accordions[0].querySelector('.acc-content');
+                firstContent.style.maxHeight = firstContent.scrollHeight + "px";
             }
-            let idx=0;
-            for(let a=0;a<N;a++) for(let b=a+1;b<N;b++){
-                const d=pos[a].distanceTo(pos[b]);
-                if(d<LD){lp[idx++]=pos[a].x;lp[idx++]=pos[a].y;lp[idx++]=pos[a].z;lp[idx++]=pos[b].x;lp[idx++]=pos[b].y;lp[idx++]=pos[b].z;}
-            }
-            lg.attributes.position.needsUpdate=true; lg.setDrawRange(0,idx/3);
-            lm.material.opacity=0.08+0.06*Math.sin(t*0.25);
-            renderer.render(scene,camera);
-        }
-        animate();
-    })();
-</script>
+        });
+    </script>
 </body>
 </html>

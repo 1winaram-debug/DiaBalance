@@ -1,352 +1,202 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Դիաbeti Tesak-nery — DiaBalance</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Դիաբետի Տեսակները — DiaBalance</title>
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=Noto+Sans+Armenian:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="mobile.css">
     <style>
         :root {
-            --bg: #f5f6fa;
-            --surface: #ffffff;
-            --blue: #1a3c6e;
-            --blue-mid: #2563b0;
-            --teal: #0cbfb0;
-            --teal-soft: #d0f5f2;
-            --gray-100: #f0f1f5;
-            --gray-200: #e2e4ed;
-            --gray-500: #8a91a8;
-            --gray-800: #1e2235;
-
-            --deep-blue: var(--bg);
-            --navy: var(--surface);
-            --mid-blue: var(--blue-mid);
-            --teal-glow: rgba(12, 191, 176, 0.25);
-            --teal-dim: rgba(12, 191, 176, 0.12);
-            --white: var(--gray-800);
-            --white-dim: var(--gray-500);
-            --glass-bg: var(--surface);
-            --glass-border: var(--gray-200);
-            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
-            --radius-lg: 26px;
-            --radius-md: 18px;
-            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
+            --bg: #f5f6fa; --surface: #ffffff; --blue: #1a3c6e;
+            --teal: #0cbfb0; --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5; --gray-200: #e2e4ed; --gray-500: #8a91a8; --gray-800: #1e2235;
         }
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        html, body { width:100%; background:var(--deep-blue); font-family:'Noto Sans Armenian','DM Sans',sans-serif; color:var(--white); scroll-behavior:smooth; }
-        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-        body::after { content:''; position:fixed; inset:0; z-index:1; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); background-repeat:repeat; background-size:200px; opacity:0.6; }
-        .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(245, 246, 250, 0.75) 100%); }
+        *, *::before, *::after { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; font-family: 'Noto Sans Armenian', 'DM Sans', sans-serif; background: var(--bg); color: var(--gray-800); min-height: 100vh; scroll-behavior: smooth; }
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 3rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--gray-200); box-shadow: 0 8px 32px rgba(26, 60, 110, .06); }
+        .logo { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 600; color: var(--blue); text-decoration: none; }
+        .logo span { color: var(--teal); }
+        .nav-back-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1.4rem; background: var(--teal-soft); color: var(--blue) !important; border: 1px solid rgba(12, 191, 176, 0.25); border-radius: 100px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-back-btn:hover { background: var(--teal); color: #ffffff !important; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3); }
+        .content-wrapper { padding-top: 120px; padding-bottom: 80px; max-width: 1000px; margin: 0 auto; width: 90%; }
+        .page-title { text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-family: 'DM Serif Display', serif; color: var(--blue); margin-bottom: 1rem; margin-top:0;}
+        .page-title span { color: var(--teal); }
+        .page-subtitle { text-align: center; color: var(--gray-500); font-size: 1.1rem; margin-bottom: 3rem; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto;}
 
-        nav { position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; background:rgba(255, 255, 255, 0.95); backdrop-filter:blur(16px); border-bottom:1px solid var(--glass-border); box-shadow:var(--glass-shadow); }
-        .logo { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:600; color:var(--blue); letter-spacing:0.05em; text-decoration:none; }
-        .logo span { color:var(--teal); }
+        /* Tab Styles */
+        .tab-nav { display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; justify-content: center; }
+        .tab-btn { background: var(--surface); border: 1px solid var(--gray-200); padding: 1rem 2rem; border-radius: 100px; font-size: 1.1rem; font-weight: 700; color: var(--gray-500); cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .tab-btn:hover { border-color: var(--teal); color: var(--blue); transform: translateY(-2px); }
+        .tab-btn.active { background: var(--teal); border-color: var(--teal); color: white; box-shadow: 0 8px 20px rgba(12, 191, 176, 0.3); }
         
-        .nav-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 1.4rem;
-            background: var(--teal-soft);
-            color: var(--blue) !important;
-            border: 1px solid rgba(12, 191, 176, 0.25);
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
+        .tab-pane { display: none; background: var(--surface); border: 1px solid var(--gray-200); border-radius: 24px; padding: 3rem; box-shadow: 0 10px 40px rgba(26, 60, 110, 0.05); animation: fadeIn 0.5s ease-out forwards; }
+        .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .type-header h2 { font-size: 2.2rem; color: var(--blue); margin-top: 0; margin-bottom: 1rem; }
+        .type-tag { display: inline-block; padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .type-desc { font-size: 1.1rem; color: var(--gray-800); line-height: 1.7; margin-bottom: 2rem; }
+        
+        .fact-box { background: var(--bg); border-radius: 16px; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .fact-item strong { display: block; font-size: 1.8rem; color: var(--teal); margin-bottom: 0.2rem; line-height: 1; }
+        .fact-item span { font-size: 0.9rem; color: var(--gray-500); font-weight: 600; }
+        
+        .type-details h4 { font-size: 1.2rem; color: var(--blue); margin-top: 0; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+        .type-details p { color: var(--gray-800); margin-bottom: 2rem; line-height: 1.6; }
+        .type-details ul { padding-left: 1.2rem; margin-bottom: 2rem; }
+        .type-details li { margin-bottom: 0.5rem; }
+
+        @media(max-width: 900px) {
+            .type-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .tab-pane { padding: 1.5rem; }
+            .tab-btn { padding: 0.8rem 1.2rem; font-size: 0.95rem; flex: 1 1 calc(50% - 1rem); justify-content: center;}
         }
-        .nav-back-btn:hover {
-            background: var(--teal);
-            color: #ffffff !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
-        }
-
-        .content-wrapper { position:relative; z-index:10; padding-top:80px; }
-        .wrap { max-width:1200px; margin:0 auto; padding:0 5%; }
-        .section-pad { padding:100px 0; }
-
-        /* PAGE HERO */
-        .page-hero { min-height:70vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:130px 5% 80px; }
-        .page-hero-badge { display:inline-flex; align-items:center; gap:0.6rem; padding:0.5rem 1.2rem; border:1px solid rgba(26,188,156,0.35); border-radius:999px; background:var(--teal-dim); font-size:0.8rem; font-weight:600; color:var(--teal); margin-bottom:1.6rem; backdrop-filter:blur(8px); }
-        .page-hero-badge span { width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px var(--teal); animation:pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-        .page-title { font-size:clamp(2.8rem,6vw,5rem); font-weight:700; line-height:1.15; margin-bottom:1.5rem; }
-        .page-title span { color:var(--teal); text-shadow:0 0 30px rgba(26,188,156,0.5); }
-        .page-subtitle { font-size:1.2rem; color:var(--white-dim); max-width:650px; margin:0 auto; line-height:1.8; }
-
-        .ds-label { display:inline-flex; align-items:center; gap:10px; background:var(--teal-dim); color:var(--teal); border:1px solid rgba(26,188,156,0.2); font-size:0.85rem; font-weight:700; padding:8px 18px; border-radius:100px; margin-bottom:1.5rem; backdrop-filter:blur(10px); }
-        .ds-h2 { font-size:clamp(2rem,4vw,3rem); font-weight:700; color:var(--white); margin-bottom:1.5rem; line-height:1.2; }
-        .ds-sub { font-size:1.1rem; color:var(--white-dim); line-height:1.8; }
-        .divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(26,188,156,0.3),transparent); }
-
-        /* TYPE CARDS (interactive tabs) */
-        .type-tabs { display:flex; gap:1rem; margin-bottom:3rem; flex-wrap:wrap; }
-        .type-tab {
-            padding:0.8rem 2rem; border-radius:100px; font-size:1rem; font-weight:600; cursor:pointer;
-            border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--white-dim);
-            backdrop-filter:blur(12px); transition:all 0.3s ease;
-        }
-        .type-tab.active, .type-tab:hover { background:var(--teal); color:var(--deep-blue); border-color:var(--teal); box-shadow:0 0 20px var(--teal-glow); }
-
-        .type-panel { display:none; }
-        .type-panel.active { display:block; }
-
-        /* TYPE HERO CARD */
-        .type-hero {
-            display:grid; grid-template-columns:1fr 1.2fr; gap:3rem; align-items:center;
-            padding:4rem; border-radius:var(--radius-lg);
-            background:var(--glass-bg); backdrop-filter:blur(16px);
-            border:1px solid var(--glass-border); box-shadow:var(--glass-shadow);
-            margin-bottom:3rem;
-        }
-        .type-hero-text {}
-        .type-hero-icon { font-size:8rem; text-align:center; filter:drop-shadow(0 0 20px currentColor); }
-        .type-hero-tag { display:inline-block; padding:0.4rem 1.2rem; border-radius:100px; font-size:0.9rem; font-weight:700; margin-bottom:1.2rem; }
-        .type-hero h2 { font-size:2.5rem; font-weight:700; color:var(--white); margin-bottom:1rem; }
-        .type-hero p { font-size:1.05rem; color:var(--white-dim); line-height:1.8; margin-bottom:1.5rem; }
-        .type-facts { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        .type-fact { padding:1.2rem; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:14px; }
-        .type-fact strong { display:block; font-size:1.8rem; font-weight:700; margin-bottom:0.3rem; }
-        .type-fact span { font-size:0.85rem; color:var(--white-dim); }
-
-        /* TYPE DETAIL GRID */
-        .type-detail-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:3rem; }
-        .detail-card { padding:2rem 1.8rem; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(12px); border-radius:22px; transition:all var(--transition); }
-        .detail-card:hover { border-color:var(--teal); transform:translateY(-6px); box-shadow:0 15px 40px rgba(26,188,156,0.15); }
-        .detail-card i { font-size:2rem; margin-bottom:1rem; display:block; }
-        .detail-card h4 { font-size:1.1rem; font-weight:600; color:var(--white); margin-bottom:0.7rem; }
-        .detail-card p { font-size:0.95rem; color:var(--white-dim); line-height:1.65; }
-
-        /* COMPARISON TABLE */
-        .compare-table { width:100%; border-collapse:collapse; border-radius:var(--radius-lg); overflow:hidden; }
-        .compare-table thead th { background:rgba(26,188,156,0.15); color:var(--teal); font-size:1rem; font-weight:700; padding:1.2rem 1.5rem; text-align:left; border-bottom:1px solid rgba(26,188,156,0.2); }
-        .compare-table tbody tr { background:rgba(26,42,58,0.3); border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s; }
-        .compare-table tbody tr:hover { background:rgba(26,188,156,0.07); }
-        .compare-table tbody td { padding:1rem 1.5rem; font-size:0.95rem; color:var(--white-dim); }
-        .compare-table tbody td:first-child { color:var(--white); font-weight:600; }
-        .badge-t1 { display:inline-block; background:rgba(91,192,235,0.15); color:#5bc0eb; border-radius:6px; padding:0.2rem 0.6rem; font-size:0.8rem; font-weight:700; }
-        .badge-t2 { display:inline-block; background:rgba(26,188,156,0.15); color:var(--teal); border-radius:6px; padding:0.2rem 0.6rem; font-size:0.8rem; font-weight:700; }
-        .badge-tg { display:inline-block; background:rgba(253,231,76,0.15); color:#fde74c; border-radius:6px; padding:0.2rem 0.6rem; font-size:0.8rem; font-weight:700; }
-
-        /* PHOTO ROW */
-        .photo-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:4rem; }
-        .photo-row-item { border-radius:var(--radius-md); overflow:hidden; position:relative; aspect-ratio:4/3; box-shadow:var(--glass-shadow); transition:all var(--transition); }
-        .photo-row-item:hover { transform:translateY(-6px); box-shadow:0 20px 50px rgba(26,188,156,0.25); }
-        .photo-row-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s; }
-        .photo-row-item:hover img { transform:scale(1.08); }
-        .photo-row-item::after { content:attr(data-label); position:absolute; bottom:0; left:0; right:0; padding:1.2rem 1rem 0.8rem; background:linear-gradient(to top, rgba(13,27,42,0.95), transparent); font-size:0.9rem; font-weight:600; }
-
-        footer { position:relative; z-index:10; text-align:center; padding:3rem; border-top:1px solid var(--glass-border); color:var(--white-dim); font-size:0.9rem; }
-        footer a { color:var(--teal); text-decoration:none; }
-
-        @media(max-width:960px) { .type-hero { grid-template-columns:1fr; } .type-detail-grid { grid-template-columns:1fr 1fr; } .photo-row { grid-template-columns:1fr 1fr; } }
-        @media(max-width:640px) { nav { padding:1rem 1.5rem; } .nav-links { display:none; } .type-detail-grid { grid-template-columns:1fr; } .photo-row { grid-template-columns:1fr; } }
+        @media(max-width: 640px) { nav { padding: 1rem 1.5rem; } }
     </style>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
-<div class="vignette"></div>
+    <nav id="navbar">
+        <a href="index.html" class="logo">Dia<span>Balance</span></a>
+        <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
+    </nav>
 
-<nav id="navbar">
-    <a href="index.html" class="logo">Dia<span>Balance</span></a>
-    <a href="index.html" class="nav-back-btn"><i class="fa-solid fa-arrow-left"></i> Վերադառնալ Գլխավոր Էջ</a>
-</nav>
+    <div class="content-wrapper">
+        <h1 class="page-title">Դիաբետի <span>Տեսակները</span></h1>
+        <p class="page-subtitle">Յուրաքանչյուր տիպ ունի իր զարգացման մեխանիզմը, ռիսկի խումբը և բուժման մոտեցումը։ Իմացեք տարբերությունները՝ գրագետ վերահսկելու համար:</p>
 
-<div class="content-wrapper">
-
-    <div class="page-hero">
-        <div>
-            <div class="page-hero-badge" data-aos="fade-down"><span></span> Դասակարգում</div>
-            <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Դիաբետի <span>Տեսակները</span></h1>
-            <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Յուրաքանչյուր տիպ ունի իր զարգացման մեխանիզմը, ռիսկի խումբը և բուժման մոտեցումը։ Իմացեք տեսակները և դրանց տարբերությունները՝ գրագետ վերահսկելու համար:</p>
+        <!-- Tabs Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-target="tab-t1"><i class="fa-solid fa-1"></i> Տիպ 1</button>
+            <button class="tab-btn" data-target="tab-t2"><i class="fa-solid fa-2"></i> Տիպ 2</button>
+            <button class="tab-btn" data-target="tab-tg"><i class="fa-solid fa-person-pregnant"></i> Գեստացիոն</button>
+            <button class="tab-btn" data-target="tab-tm"><i class="fa-solid fa-magnifying-glass-chart"></i> LADA / MODY</button>
         </div>
+
+        <!-- Tab 1 -->
+        <div class="tab-pane active" id="tab-t1">
+            <div class="type-grid">
+                <div>
+                    <div class="type-header">
+                        <span class="type-tag" style="background:rgba(91,192,235,0.15);color:#5bc0eb;">Ինսուլինակախյալ</span>
+                        <h2>Աուտոիմուն Դիաբետ</h2>
+                        <p class="type-desc">1-ին տիպի դիաբետի դեպքում իմունային համակարգը սխալմամբ հարձակվում է ենթաստամոքսային գեղձի վրա՝ ոչնչացնելով ինսուլին արտադրող բետա բջիջները: Արդյունքում օրգանիզմն ընդհանրապես ինսուլին չի արտադրում, և պահանջվում են ցմահ ներարկումներ:</p>
+                    </div>
+                    <div class="fact-box">
+                        <div class="fact-item"><strong style="color:#5bc0eb;">5-10%</strong><span>Բոլոր դեպքերից</span></div>
+                        <div class="fact-item"><strong style="color:#5bc0eb;">5-25</strong><span>Հաճախակի տարիքը</span></div>
+                    </div>
+                </div>
+                <div class="type-details">
+                    <h4><i class="fa-solid fa-triangle-exclamation" style="color:#5bc0eb;"></i> Ախտանիշները</h4>
+                    <ul>
+                        <li>Հաճախակի միզարձակում և անհագ ծարավ</li>
+                        <li>Քաշի կտրուկ և անբացատրելի կորուստ</li>
+                        <li>Մշտական հոգնածություն և էներգիայի պակաս</li>
+                    </ul>
+                    <h4><i class="fa-solid fa-syringe" style="color:#5bc0eb;"></i> Բուժում և Վերահսկում</h4>
+                    <p>Տիպ 1 դիաբետ ունեցող մարդիկ ամեն օր պետք է ստանան ինսուլին (ներարկումների կամ պոմպի միջոցով)՝ արյան շաքարը կարգավորելու համար: Կարևոր է նաև ածխաջրերի հաշվարկը և ֆիզիկական ակտիվությունը:</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2 -->
+        <div class="tab-pane" id="tab-t2">
+            <div class="type-grid">
+                <div>
+                    <div class="type-header">
+                        <span class="type-tag" style="background:rgba(26,188,156,0.15);color:var(--teal);">Ինսուլինառեզիստենտ</span>
+                        <h2>Ապրելակերպի Դիաբետ</h2>
+                        <p class="type-desc">2-րդ տիպի դիաբետի դեպքում օրգանիզմի բջիջները դադարում են ճիշտ արձագանքել ինսուլինին: Ենթաստամոքսային գեղձն աշխատում է գերծանրաբեռնված ռեժիմով՝ փորձելով կոմպենսացնել, մինչև որ սպառվում է:</p>
+                    </div>
+                    <div class="fact-box">
+                        <div class="fact-item"><strong style="color:var(--teal);">90%</strong><span>Բոլոր դեպքերից</span></div>
+                        <div class="fact-item"><strong style="color:var(--teal);">40+</strong><span>Հաճախակի տարիքը</span></div>
+                    </div>
+                </div>
+                <div class="type-details">
+                    <h4><i class="fa-solid fa-burger" style="color:var(--teal);"></i> Ռիսկի Գործոնները</h4>
+                    <ul>
+                        <li>Ավելորդ քաշ և ճարպակալում</li>
+                        <li>Նստակյաց կյանք և անառողջ սնունդ</li>
+                        <li>Ժառանգական նախատրամադրվածություն</li>
+                    </ul>
+                    <h4><i class="fa-solid fa-leaf" style="color:var(--teal);"></i> Բուժում և Վերահսկում</h4>
+                    <p>Բուժման հիմքում ընկած է առողջ ապրելակերպը՝ ճիշտ սննդակարգ և կանոնավոր մարզումներ: Հաճախ նշանակվում են արյան շաքարն իջեցնող հաբեր, հազվադեպ պահանջվում է ինսուլին:</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3 -->
+        <div class="tab-pane" id="tab-tg">
+            <div class="type-grid">
+                <div>
+                    <div class="type-header">
+                        <span class="type-tag" style="background:rgba(253,231,76,0.15);color:#e2c510;">Ժամանակավոր</span>
+                        <h2>Հղիների Դիաբետ</h2>
+                        <p class="type-desc">Գեստացիոն դիաբետը զարգանում է բացառապես հղիության ընթացքում՝ հորմոնալ մեծ փոփոխությունների պատճառով: Այն սովորաբար ինքնուրույն անհետանում է ծննդաբերությունից հետո:</p>
+                    </div>
+                    <div class="fact-box">
+                        <div class="fact-item"><strong style="color:#e2c510;">24-28</strong><span>Շաբաթում բացահայտում</span></div>
+                        <div class="fact-item"><strong style="color:#e2c510;">Բարձր ռիսկ</strong><span>Ապագա Տիպ 2-ի համար</span></div>
+                    </div>
+                </div>
+                <div class="type-details">
+                    <h4><i class="fa-solid fa-baby-carriage" style="color:#e2c510;"></i> Ռիսկի Գործոնները</h4>
+                    <ul>
+                        <li>Ավելորդ քաշ հղիությունից առաջ</li>
+                        <li>Պոլիկիստոզային ձվարանների համախտանիշ</li>
+                        <li>Դիաբետի ընտանեկան անամնեզ</li>
+                    </ul>
+                    <h4><i class="fa-solid fa-stethoscope" style="color:#e2c510;"></i> Վերահսկում</h4>
+                    <p>Վերահսկվում է հատուկ դիետայով, չափավոր ֆիզիկական ակտիվությամբ և գլյուկոմետրով պարբերական չափումներով։ Որոշ դեպքերում նշանակվում է ինսուլին՝ պտղի առողջությունն ապահովելու համար:</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4 -->
+        <div class="tab-pane" id="tab-tm">
+            <div class="type-grid">
+                <div>
+                    <div class="type-header">
+                        <span class="type-tag" style="background:rgba(138,145,168,0.15);color:var(--gray-500);">Հազվադեպ Հանդիպող</span>
+                        <h2>LADA և MODY</h2>
+                        <p class="type-desc">Բացի հիմնական տեսակներից, գոյություն ունեն դիաբետի սպեցիֆիկ տեսակներ, որոնք հաճախ սխալ են ախտորոշվում տարիքի կամ քաշի պատճառով:</p>
+                    </div>
+                </div>
+                <div class="type-details">
+                    <h4><i class="fa-solid fa-mask"></i> LADA (Latent Autoimmune Diabetes in Adults)</h4>
+                    <p>Սա Տիպ 1 դիաբետի դանդաղ զարգացող ձևն է, որն ախտորոշվում է մեծ տարիքում: Հաճախ սխալմամբ շփոթում են Տիպ 2-ի հետ, սակայն այն չի արձագանքում դիետային կամ դեղահաբերին և պահանջում է ինսուլինի ներարկումներ:</p>
+                    
+                    <h4><i class="fa-solid fa-network-wired"></i> MODY (Maturity-Onset Diabetes of the Young)</h4>
+                    <p>Խիստ ժառանգական, գենետիկ մուտացիայով պայմանավորված դիաբետ է։ Սովորաբար ախտորոշվում է մինչև 25 տարեկան անձանց մոտ, ովքեր չունեն ավելորդ քաշ։ Բուժումը կախված է մուտացված գենի տեսակից:</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="wrap">
+    <script src="mobile-nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const panes = document.querySelectorAll('.tab-pane');
 
-        <!-- TABS -->
-        <div data-aos="fade-up">
-            <div class="type-tabs">
-                <div class="type-tab active" onclick="showType('t1')" id="t1"><i class="fa-solid fa-1"></i> Տիպ 1</div>
-                <div class="type-tab" onclick="showType('t2')" id="t2"><i class="fa-solid fa-2"></i> Տիպ 2</div>
-                <div class="type-tab" onclick="showType('tg')" id="tg"><i class="fa-solid fa-person-pregnant"></i> Գեստացիոն (Հղիների)</div>
-            </div>
-        </div>
-
-        <!-- TYPE 1 PANEL -->
-        <div class="type-panel active" id="panel-t1" data-aos="fade-up" data-aos-delay="100">
-            <div class="type-hero">
-                <div class="type-hero-text">
-                    <div class="type-hero-tag" style="background:rgba(91,192,235,0.15);color:#5bc0eb;">Տիպ 1 - Ինսուլինակախյալ</div>
-                    <h2>Աուտոիմուն Դիաբետ</h2>
-                    <p>1-ին տիպի դիաբետի դեպքում իմունային համակարգը սխալմամբ հարձակվում է ենթաստամոքսային գեղձի վրա՝ ոչնչացնելով ինսուլին արտադրող բետա բջիջները: Արդյունքում օրգանիզմն ընդհանրապես ինսուլին չի արտադրում, և մարդն անկարող է ապրել առանց դրա ներարկումների:</p>
-                    <div class="type-facts">
-                        <div class="type-fact"><strong style="color:#5bc0eb;">5-10%</strong><span>դիաբետի բոլոր դեպքերից</span></div>
-                        <div class="type-fact"><strong style="color:#5bc0eb;">5-25</strong><span>բացահայտման հաճախակի տարիքը</span></div>
-                        <div class="type-fact"><strong style="color:#5bc0eb;">Անբուժելի է</strong><span>պահանջվում է ցմահ հսկողություն</span></div>
-                        <div class="type-fact"><strong style="color:#5bc0eb;">Ամենօրյա</strong><span>ինսուլինի ներարկումներ</span></div>
-                    </div>
-                </div>
-                <div class="type-hero-icon" style="color:#5bc0eb;"><i class="fa-solid fa-vial-virus"></i></div>
-            </div>
-
-            <div class="type-detail-grid">
-                <div class="detail-card"><i class="fa-solid fa-dna" style="color:#5bc0eb;"></i><h4>Պատճառները</h4><p>Աուտոիմուն ռեակցիա՝ հաճախ գենետիկ նախատրամադրվածությամբ: Այն կարող է խթանվել և ի հայտ գալ տարբեր վիրուսային ինֆեկցիաներից հետո:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-triangle-exclamation" style="color:#5bc0eb;"></i><h4>Ախտանիշները</h4><p>Կտրուկ զարգացում և արտահայտում, անհագ ծարավ, հաճախամիզություն, մարմնի քաշի կտրուկ կորուստ, մշտական քաղց:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-syringe" style="color:#5bc0eb;"></i><h4>Բուժում</h4><p>Ամենօրյա ինսուլինաթերապիա: Արյան շաքարի մշտական կամ անընդհատ վերահսկողություն (օրինակ՝ CGM սենսորի և ինսուլինային պոմպի միջոցով):</p></div>
-            </div>
-
-            <div class="photo-row">
-                <div class="photo-row-item" data-label="Ինսուլինային պոմպ"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&fit=crop" alt="insulin pump" loading="lazy"/></div>
-                <div class="photo-row-item" data-label="Բժշկական ստուգում"><img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80&fit=crop" alt="medical check" loading="lazy"/></div>
-                <div class="photo-row-item" data-label="Առողջ ապրելակերպ"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80&fit=crop" alt="healthy lifestyle" loading="lazy"/></div>
-            </div>
-        </div>
-
-        <!-- TYPE 2 PANEL -->
-        <div class="type-panel" id="panel-t2">
-            <div class="type-hero">
-                <div class="type-hero-text">
-                    <div class="type-hero-tag" style="background:rgba(26,188,156,0.15);color:var(--teal);">Տիպ 2 - Ինսուլինառեզիստենտ</div>
-                    <h2>Ապրելակերպի Դիաբետ</h2>
-                    <p>2-րդ տիպի դիաբետի դեպքում օրգանիզմի բջիջները դադարում են ճիշտ արձագանքել ինսուլինին (ինսուլինառեզիստենտություն): Ենթաստամոքսային գեղձն աշխատում է գերծանրաբեռնված ռեժիմով՝ փորձելով կոմպենսացնել, մինչև որ վերջնականապես սպառվում է:</p>
-                    <div class="type-facts">
-                        <div class="type-fact"><strong style="color:var(--teal);">~90%</strong><span>դիաբետի դեպքերի մեծամասնությունը</span></div>
-                        <div class="type-fact"><strong style="color:var(--teal);">40+</strong><span>ամենահաճախ ախտորոշվող տարիքը</span></div>
-                        <div class="type-fact"><strong style="color:var(--teal);">Կարևոր է</strong><span>քաշի վերահսկումն ու սպորտը</span></div>
-                        <div class="type-fact"><strong style="color:var(--teal);">Կանխարգելելի է</strong><span>առողջ ապրելակերպի միջոցով</span></div>
-                    </div>
-                </div>
-                <div class="type-hero-icon" style="color:var(--teal);"><i class="fa-solid fa-person-running"></i></div>
-            </div>
-
-            <div class="type-detail-grid">
-                <div class="detail-card"><i class="fa-solid fa-burger" style="color:var(--teal);"></i><h4>Ռիսկի Գործոնները</h4><p>Ավելորդ քաշ, վատ սննդակարգ և նստակյաց կյանք — սրանք հիմնական գործոններն են, որոնք բարձրացնում են հիվանդության ռիսկը:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-clock" style="color:var(--teal);"></i><h4>Աստիճանական զարգացում</h4><p>Հիվանդությունը զարգանում է տարիների ընթացքում և սկզբնական շրջանում կարող է մնալ բացարձակապես աննկատ:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-leaf" style="color:var(--teal);"></i><h4>Բուժում և վերահսկում</h4><p>Խիստ դիետա, ֆիզիկական ակտիվություն և նյութափոխանակությունը կարգավորող դեղամիջոցներ: Հազվադեպ պահանջվում է նաև ինսուլին:</p></div>
-            </div>
-
-            <div class="photo-row">
-                <div class="photo-row-item" data-label="Առողջ սնունդ"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80&fit=crop" alt="healthy food" loading="lazy"/></div>
-                <div class="photo-row-item" data-label="Ֆիզիկական ակտիվություն"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80&fit=crop" alt="exercise" loading="lazy"/></div>
-                <div class="photo-row-item" data-label="Գլյուկոզայի մոնիտորինգ"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&fit=crop" alt="medical monitoring" loading="lazy"/></div>
-            </div>
-        </div>
-
-        <!-- TYPE GEO PANEL -->
-        <div class="type-panel" id="panel-tg">
-            <div class="type-hero">
-                <div class="type-hero-text">
-                    <div class="type-hero-tag" style="background:rgba(253,231,76,0.15);color:#fde74c;">Գեստացիոն - Հղիների Դիաբետ</div>
-                    <h2>Հղիության Դիաբետ</h2>
-                    <p>Գեստացիոն դիաբետը զարգանում է հղիության ընթացքում՝ պայմանավորված մոր օրգանիզմում հորմոնալ մեծ փոփոխություններով: Սովորաբար այն ինքնուրույն անհետանում է ծննդաբերությունից հետո, սակայն մեծացնում է ապագայում 2-րդ տիպի դիաբետի զարգացման ռիսկը:</p>
-                    <div class="type-facts">
-                        <div class="type-fact"><strong style="color:#fde74c;">6-9%</strong><span>հանդիպում է հղիների շրջանում</span></div>
-                        <div class="type-fact"><strong style="color:#fde74c;">Ժամանակավոր</strong><span>սովորաբար անցնում է ծննդաբերությունից հետո</span></div>
-                        <div class="type-fact"><strong style="color:#fde74c;">Պարտադիր</strong><span>արյան շաքարի մշտական հսկողություն</span></div>
-                        <div class="type-fact"><strong style="color:#fde74c;">3x</strong><span>ապագայում 2-րդ տիպի ռիսկի մեծացում</span></div>
-                    </div>
-                </div>
-                <div class="type-hero-icon" style="color:#fde74c;"><i class="fa-solid fa-person-pregnant"></i></div>
-            </div>
-
-            <div class="type-detail-grid">
-                <div class="detail-card"><i class="fa-solid fa-baby" style="color:#fde74c;"></i><h4>Առաջացման պատճառները</h4><p>Պլացենտայի կողմից արտադրվող հորմոնները նվազեցնում են մոր օրգանիզմի զգայունությունը ինսուլինի նկատմամբ:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-stethoscope" style="color:#fde74c;"></i><h4>Ախտորոշում</h4><p>24-ից 28-րդ շաբաթներում իրականացվում է գլյուկոզայի տոլերանտության հատուկ թեստ (GTT)՝ բոլոր հղիների համար:</p></div>
-                <div class="detail-card"><i class="fa-solid fa-heart" style="color:#fde74c;"></i><h4>Բուժում և վերահսկում</h4><p>Հատուկ սննդակարգ, չափավոր ակտիվություն, շաքարի մոնիտորինգ, անհրաժեշտության դեպքում նաև՝ ինսուլինի ժամանակավոր ներարկում:</p></div>
-            </div>
-
-            <div class="photo-row">
-                <div class="photo-row-item" data-label="Հղիության հսկողություն"><img src="https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&q=80&fit=crop" alt="pregnancy care" loading="lazy" style="object-fit:cover;"/></div>
-                <div class="photo-row-item" data-label="Առողջ սննդակարգ"><img src="https://images.unsplash.com/photo-    (function(){
-        const canvas = document.getElementById('bg-canvas');
-        const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000,0);
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-        camera.position.z = 38;
-        scene.fog = new THREE.FogExp2(0xf5f6fa, 0.022);
-        const TEAL = new THREE.Color(0x0cbfb0), BLUE = new THREE.Color(0x2563b0), GRAY = new THREE.Color(0xc0c8d8);
-        const N=55, SP=22, LD=9, pos=[], meshes=[], vel=[], ph[];
-        const sg = new THREE.SphereGeometry(1,12,12);
-        for(let i=0;i<N;i++){
-            const p=new THREE.Vector3((Math.random()-.5)*SP*2,(Math.random()-.5)*SP*1.3,(Math.random()-.5)*SP*0.7);
-            pos.push(p); ph.push(Math.random()*Math.PI*2);
-            const t=Math.random(); const c=t<0.4?TEAL.clone():t<0.75?BLUE.clone().lerp(TEAL,0.3):GRAY.clone();
-            const r=0.08+Math.random()*0.28;
-            const m=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.6}));
-            m.scale.setScalar(r); m.position.copy(p); scene.add(m); meshes.push(m);
-            vel.push(new THREE.Vector3((Math.random()-.5)*0.008,(Math.random()-.5)*0.008,(Math.random()-.5)*0.004));
-        }
-        const lg=new THREE.BufferGeometry(), max=N*(N-1)/2, lp=new Float32Array(max*2*3);
-        lg.setAttribute('position',new THREE.BufferAttribute(lp,3));
-        const lm=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x0cbfb0,transparent:true,opacity:0.1}));
-        scene.add(lm);
-        const mouse=new THREE.Vector2(0,0);
-        window.addEventListener('mousemove',e=>{mouse.x=(e.clientX/window.innerWidth-.5)*2;mouse.y=(e.clientY/window.innerHeight-.5)*2;});
-        window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-        const clock=new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);const t=clock.getElapsedTime();
-            camera.position.x+=(mouse.x*4-camera.position.x)*0.03;camera.position.y+=(-mouse.y*3-camera.position.y)*0.03;camera.lookAt(scene.position);
-            for(let i=0;i<N;i++){const v=vel[i],p=pos[i],pph=ph[i];p.x+=v.x+Math.cos(t*0.3+pph)*0.01;p.y+=v.y+Math.sin(t*0.4+pph)*0.015;p.z+=v.z;if(Math.abs(p.x)>SP)v.x*=-1;if(Math.abs(p.y)>SP*0.7)v.y*=-1;if(Math.abs(p.z)>SP*0.4)v.z*=-1;meshes[i].position.copy(p);meshes[i].material.opacity=0.35+0.25*Math.sin(t*0.7+pph);}
-            let idx=0;for(let a=0;a<N;a++)for(let b=a+1;b<N;b++){const d=pos[a].distanceTo(pos[b]);if(d<LD){lp[idx++]=pos[a].x;lp[idx++]=pos[a].y;lp[idx++]=pos[a].z;lp[idx++]=pos[b].x;lp[idx++]=pos[b].y;lp[idx++]=pos[b].z;}}
-            lg.attributes.position.needsUpdate=true;lg.setDrawRange(0,idx/3);
-            lm.material.opacity=0.08+0.06*Math.sin(t*0.25);renderer.render(scene,camera);
-        }
-        animate();
-    })();-tab').classList.add('active');
-    }
-
-    (function(){
-        const canvas = document.getElementById('bg-canvas');
-        const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000,0);
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-        camera.position.z = 38;
-        scene.fog = new THREE.FogExp2(0x0d1b2a, 0.022);
-        const TEAL=new THREE.Color(0x1abc9c),BLUE=new THREE.Color(0x2c3e50),WHITE=new THREE.Color(0xd0e8ff);
-        const N=55,SP=22,LD=9,pos=[],meshes=[],vel=[],ph=[];
-        const sg=new THREE.SphereGeometry(1,12,12);
-        for(let i=0;i<N;i++){
-            const p=new THREE.Vector3((Math.random()-.5)*SP*2,(Math.random()-.5)*SP*1.3,(Math.random()-.5)*SP*0.7);
-            pos.push(p);ph.push(Math.random()*Math.PI*2);
-            const t=Math.random();const c=t<0.4?TEAL.clone():t<0.75?BLUE.clone().lerp(TEAL,0.3):WHITE.clone();
-            const r=0.08+Math.random()*0.28;
-            const m=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.8}));
-            m.scale.setScalar(r);m.position.copy(p);scene.add(m);meshes.push(m);
-            vel.push(new THREE.Vector3((Math.random()-.5)*0.008,(Math.random()-.5)*0.008,(Math.random()-.5)*0.004));
-        }
-        const lg=new THREE.BufferGeometry(),max=N*(N-1)/2,lp=new Float32Array(max*2*3);
-        lg.setAttribute('position',new THREE.BufferAttribute(lp,3));
-        const lm=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x1abc9c,transparent:true,opacity:0.12}));
-        scene.add(lm);
-        const mouse=new THREE.Vector2(0,0);
-        window.addEventListener('mousemove',e=>{mouse.x=(e.clientX/window.innerWidth-.5)*2;mouse.y=(e.clientY/window.innerHeight-.5)*2;});
-        window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-        const clock=new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);const t=clock.getElapsedTime();
-            camera.position.x+=(mouse.x*4-camera.position.x)*0.03;camera.position.y+=(-mouse.y*3-camera.position.y)*0.03;camera.lookAt(scene.position);
-            for(let i=0;i<N;i++){const v=vel[i],p=pos[i],pph=ph[i];p.x+=v.x+Math.cos(t*0.3+pph)*0.01;p.y+=v.y+Math.sin(t*0.4+pph)*0.015;p.z+=v.z;if(Math.abs(p.x)>SP)v.x*=-1;if(Math.abs(p.y)>SP*0.7)v.y*=-1;if(Math.abs(p.z)>SP*0.4)v.z*=-1;meshes[i].position.copy(p);meshes[i].material.opacity=0.4+0.3*Math.sin(t*0.7+pph);}
-            let idx=0;for(let a=0;a<N;a++)for(let b=a+1;b<N;b++){const d=pos[a].distanceTo(pos[b]);if(d<LD){lp[idx++]=pos[a].x;lp[idx++]=pos[a].y;lp[idx++]=pos[a].z;lp[idx++]=pos[b].x;lp[idx++]=pos[b].y;lp[idx++]=pos[b].z;}}
-            lg.attributes.position.needsUpdate=true;lg.setDrawRange(0,idx/3);
-            lm.material.opacity=0.12+0.08*Math.sin(t*0.25);renderer.render(scene,camera);
-        }
-        animate();
-    })();
-</script>
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

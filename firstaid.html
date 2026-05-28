@@ -1,177 +1,81 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Առաջին Օգնություն — DiaBalance</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=Noto+Sans+Armenian:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="mobile.css">
     <style>
         :root {
-            --bg: #f5f6fa;
-            --surface: #ffffff;
-            --blue: #1a3c6e;
-            --blue-mid: #2563b0;
-            --teal: #0cbfb0;
-            --teal-soft: #d0f5f2;
-            --gray-100: #f0f1f5;
-            --gray-200: #e2e4ed;
-            --gray-500: #8a91a8;
-            --gray-800: #1e2235;
+            --bg: #f5f6fa; --surface: #ffffff; --blue: #1a3c6e;
+            --teal: #0cbfb0; --teal-soft: #d0f5f2;
+            --gray-100: #f0f1f5; --gray-200: #e2e4ed; --gray-500: #8a91a8; --gray-800: #1e2235;
+            --red: #e05252; --red-soft: rgba(224, 82, 82, 0.1);
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; font-family: 'Noto Sans Armenian', 'DM Sans', sans-serif; background: var(--bg); color: var(--gray-800); min-height: 100vh; scroll-behavior: smooth; }
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 3rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--gray-200); box-shadow: 0 8px 32px rgba(26, 60, 110, .06); }
+        .logo { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 600; color: var(--blue); text-decoration: none; }
+        .logo span { color: var(--teal); }
+        .nav-back-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1.4rem; background: var(--teal-soft); color: var(--blue) !important; border: 1px solid rgba(12, 191, 176, 0.25); border-radius: 100px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-back-btn:hover { background: var(--teal); color: #ffffff !important; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3); }
+        .content-wrapper { padding-top: 120px; padding-bottom: 80px; max-width: 1200px; margin: 0 auto; width: 95%; }
+        .page-title { text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-family: 'DM Serif Display', serif; color: var(--blue); margin-bottom: 1rem; margin-top:0;}
+        .page-title span { color: var(--red); }
+        .page-subtitle { text-align: center; color: var(--gray-500); font-size: 1.1rem; margin-bottom: 3rem; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto;}
 
-            --deep-blue: var(--bg);
-            --navy: var(--surface);
-            --mid-blue: var(--blue-mid);
-            --teal-glow: rgba(12, 191, 176, 0.25);
-            --teal-dim: rgba(12, 191, 176, 0.12);
-            --white: var(--gray-800);
-            --white-dim: var(--gray-500);
-            --glass-bg: var(--surface);
-            --glass-border: var(--gray-200);
-            --glass-shadow: 0 8px 32px rgba(26, 60, 110, .06);
-            --radius-lg: 26px;
-            --radius-md: 18px;
-            --transition: 0.45s cubic-bezier(0.22,0.87,0.38,0.99);
-        }
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        html, body {
-            width:100%;
-            background: var(--bg);
-            font-family: 'Noto Sans Armenian','DM Sans',sans-serif;
-            color: var(--white);
-            scroll-behavior: smooth;
-        }
-        #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-        body::after {
-            content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            background-repeat:repeat; background-size:200px; opacity:0.6;
-        }
-        .vignette { position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(245, 246, 250, 0.75) 100%); }
-
-        /* NAV */
-        nav {
-            position:fixed; top:0; left:0; right:0; z-index:50;
-            display:flex; align-items:center; justify-content:space-between;
-            padding:1.1rem 3rem;
-            background:rgba(255, 255, 255, 0.95);
-            backdrop-filter:blur(16px);
-            border-bottom:1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-        .logo { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:600; color:var(--blue); letter-spacing:0.05em; text-decoration:none; }
-        .logo span { color:var(--teal); }
+        /* Emergency Cards */
+        .em-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem; }
+        .em-card { background: var(--surface); border: 1px solid var(--gray-200); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(26, 60, 110, 0.05); transition: all 0.4s ease; position: relative; display: flex; flex-direction: column; }
+        .em-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .em-hypo { border-top: 8px solid #5bc0eb; }
+        .em-hyper { border-top: 8px solid var(--red); }
         
-        .nav-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 1.4rem;
-            background: var(--teal-soft);
-            color: var(--blue) !important;
-            border: 1px solid rgba(12, 191, 176, 0.25);
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .nav-back-btn:hover {
-            background: var(--teal);
-            color: #ffffff !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(12, 191, 176, 0.3);
-        }
-
-        /* CONTENT */
-        .content-wrapper { position:relative; z-index:10; padding-top:80px; }
-        .wrap { max-width:1200px; margin:0 auto; padding:0 5%; }
-        .section-pad { padding:100px 0; }
-
-        /* PAGE HERO */
-        .page-hero {
-            min-height:65vh; display:flex; align-items:center; justify-content:center;
-            text-align:center; padding:120px 5% 80px;
-            background:transparent;
-        }
-        .page-hero-badge {
-            display:inline-flex; align-items:center; gap:0.6rem;
-            padding:0.5rem 1.2rem; border:1px solid rgba(224, 82, 82, 0.35);
-            border-radius:999px; background:rgba(224, 82, 82, 0.1);
-            font-size:0.8rem; font-weight:600; color:#e05252;
-            margin-bottom:1.6rem; backdrop-filter:blur(8px);
-        }
-        .page-hero-badge span { width:8px; height:8px; border-radius:50%; background:#e05252; box-shadow:0 0 10px #e05252; animation:pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-        .page-title { font-size:clamp(2.8rem,6vw,5rem); font-weight:700; line-height:1.15; margin-bottom:1.5rem; color:var(--blue); }
-        .page-title span { color:#e05252; text-shadow:0 0 30px rgba(224, 82, 82, 0.3); }
-        .page-subtitle { font-size:1.2rem; color:var(--white-dim); max-width:600px; margin:0 auto; line-height:1.8; }
-
-        /* SHARED COMPONENTS */
-        .glass-card {
-            background:var(--glass-bg); backdrop-filter:blur(16px);
-            border:1px solid var(--glass-border); border-radius:var(--radius-lg);
-            box-shadow:var(--glass-shadow); transition:all var(--transition); position:relative; overflow:hidden;
-        }
-        .glass-card:hover { border-color:var(--teal); box-shadow:0 15px 50px rgba(26,188,156,0.1); }
-        .ds-label { display:inline-flex; align-items:center; gap:10px; background:rgba(224, 82, 82, 0.1); color:#e05252; border:1px solid rgba(224, 82, 82, 0.2); font-size:0.85rem; font-weight:700; padding:8px 18px; border-radius:100px; margin-bottom:1.5rem; }
-        .ds-h2 { font-size:clamp(2rem,4vw,3rem); font-weight:700; color:var(--blue); margin-bottom:1.5rem; line-height:1.2; }
-        .ds-sub { font-size:1.05rem; color:var(--white-dim); line-height:1.8; }
-        .divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(26,188,156,0.3),transparent); }
-
-        /* PHOTO STRIP */
-        .photo-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:5rem; }
-        .photo-card {
-            border-radius:var(--radius-md); overflow:hidden; position:relative; aspect-ratio:4/3;
-            box-shadow:var(--glass-shadow); transition:all var(--transition);
-        }
-        .photo-card:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 20px 50px rgba(26,188,156,0.2); }
-        .photo-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s ease; }
-        .photo-card:hover img { transform:scale(1.1); }
-        .photo-card-label {
-            position:absolute; bottom:0; left:0; right:0; padding:1.5rem 1.2rem 1rem;
-            background:linear-gradient(to top, rgba(13,27,42,0.8), transparent);
-            font-size:0.95rem; font-weight:700; color:#ffffff;
-        }
-
-        /* EMERGENCY CARDS */
-        .emergency-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
-        .em-card { padding:3rem; border-top: 4px solid transparent; }
-        .em-card.hypo { border-top-color: #5bc0eb; }
-        .em-card.hyper { border-top-color: #e05252; }
+        .em-header { padding: 2.5rem 2rem; background: rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1.5rem; border-bottom: 1px solid var(--gray-200); }
+        .em-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; flex-shrink: 0; }
+        .em-hypo .em-icon { background: #5bc0eb; box-shadow: 0 10px 25px rgba(91, 192, 235, 0.4); }
+        .em-hyper .em-icon { background: var(--red); box-shadow: 0 10px 25px rgba(224, 82, 82, 0.4); }
         
-        .em-header { display:flex; align-items:center; gap:1.2rem; margin-bottom:2rem; }
-        .em-icon { width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:#fff; }
-        .hypo .em-icon { background:#5bc0eb; box-shadow:0 0 20px rgba(91, 192, 235, 0.4); }
-        .hyper .em-icon { background:#e05252; box-shadow:0 0 20px rgba(224, 82, 82, 0.4); }
+        .em-title { font-size: 1.8rem; font-weight: 700; color: var(--blue); margin: 0; line-height: 1.2; }
+        .em-subtitle { font-weight: 600; margin-top: 0.5rem; font-size: 1.05rem; }
+        .em-hypo .em-subtitle { color: #5bc0eb; }
+        .em-hyper .em-subtitle { color: var(--red); }
         
-        .em-title { font-size:1.8rem; font-weight:700; color:var(--blue); }
-        .em-subtitle { font-size:1rem; color:var(--gray-500); }
+        .em-body { padding: 2.5rem 2rem; flex: 1; display: flex; flex-direction: column; }
+        .em-section-title { font-size: 1.15rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
         
-        .em-symptoms { margin-bottom:2rem; }
-        .em-symptoms h4 { font-size:1.1rem; color:var(--blue); margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
-        .sym-tags { display:flex; flex-wrap:wrap; gap:0.6rem; }
-        .sym-tag { padding:0.4rem 1rem; background:var(--gray-100); border:1px solid var(--gray-200); border-radius:100px; font-size:0.85rem; font-weight:600; color:var(--gray-800); }
+        .sym-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2.5rem; }
+        .sym-tag { background: var(--gray-100); padding: 0.5rem 1.2rem; border-radius: 100px; font-size: 0.95rem; font-weight: 600; color: var(--gray-800); }
         
-        .action-steps { display:flex; flex-direction:column; gap:1.2rem; }
-        .step-item { display:flex; gap:1rem; align-items:flex-start; }
-        .step-num { flex-shrink:0; width:32px; height:32px; background:var(--teal-soft); color:var(--teal); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem; border:1px solid rgba(12,191,176,0.3); }
-        .step-content strong { display:block; font-size:1rem; color:var(--blue); margin-bottom:0.2rem; }
-        .step-content p { font-size:0.9rem; color:var(--white-dim); line-height:1.5; }
+        .action-list { list-style: none; padding: 0; margin: 0 0 2.5rem 0; counter-reset: action-step; flex: 1; }
+        .action-list li { position: relative; padding-left: 3.5rem; margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.6; color: var(--gray-800); }
+        .action-list li::before { 
+            counter-increment: action-step; content: counter(action-step); 
+            position: absolute; left: 0; top: -2px; width: 36px; height: 36px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 700; font-size: 1rem; color: white;
+        }
+        .em-hypo .action-list li::before { background: #5bc0eb; }
+        .em-hyper .action-list li::before { background: var(--red); }
+        
+        .alert-callout { padding: 1.5rem; border-radius: 16px; font-weight: 600; font-size: 1rem; display: flex; gap: 1rem; align-items: flex-start; line-height: 1.5;}
+        .alert-callout i { font-size: 1.5rem; margin-top: 2px;}
+        .em-hypo .alert-callout { background: rgba(91, 192, 235, 0.1); border: 1px solid rgba(91, 192, 235, 0.3); color: #2e86ab; }
+        .em-hyper .alert-callout { background: var(--red-soft); border: 1px solid rgba(224, 82, 82, 0.3); color: #b73232; }
 
-        footer{position:relative;z-index:10;text-align:center;padding:3rem;border-top:1px solid var(--glass-border);color:var(--white-dim);font-size:.9rem}
-        footer a{color:var(--teal);text-decoration:none}
-
-        @media(max-width:900px) { .emergency-grid { grid-template-columns:1fr; } .photo-strip { grid-template-columns:1fr; } }
+        @media(max-width: 900px) {
+            .em-grid { grid-template-columns: 1fr; }
+            .em-header { padding: 2rem 1.5rem; }
+            .em-body { padding: 2rem 1.5rem; }
+        }
+        @media(max-width: 640px) { nav { padding: 1rem 1.5rem; } }
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
-    <div class="vignette"></div>
 
     <nav id="navbar">
         <a href="index.html" class="logo">Dia<span>Balance</span></a>
@@ -179,226 +83,78 @@
     </nav>
 
     <div class="content-wrapper">
-        <div class="page-hero">
-            <div>
-                <div class="page-hero-badge" data-aos="fade-down"><span></span> Շտապ Օգնություն</div>
-                <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">Առաջին <span>Օգնություն</span></h1>
-                <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">Իմանալով ճիշտ գործողությունները կրիտիկական իրավիճակներում՝ կարող եք փրկել կյանքեր: Ծանոթացեք հիպոգլիկեմիայի և հիպերգլիկեմիայի առաջին օգնության քայլերին:</p>
-            </div>
-        </div>
+        <h1 class="page-title">Առաջին <span>Օգնություն</span></h1>
+        <p class="page-subtitle">Կրիտիկական իրավիճակներում գործելու ճշգրիտ կանոնակարգ՝ հիվանդի կյանքն ու առողջությունը փրկելու համար:</p>
 
-        <div class="wrap">
-            <div class="photo-strip" data-aos="fade-up">
-                <div class="photo-card">
-                    <img src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=800&q=80&fit=crop" alt="First aid kit" />
-                    <div class="photo-card-label">Դեղատուփ և պարագաներ</div>
-                </div>
-                <div class="photo-card">
-                    <img src="https://images.unsplash.com/photo-1513224502586-d1e602410265?w=800&q=80&fit=crop" alt="Sweet food for hypo" />
-                    <div class="photo-card-label">Արագ ածխաջրեր (Հիպոգլիկեմիա)</div>
-                </div>
-                <div class="photo-card">
-                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80&fit=crop" alt="Doctor emergency" />
-                    <div class="photo-card-label">Շտապ բժշկական օգնություն</div>
-                </div>
-            </div>
-
-            <section class="section-pad" id="guide">
-                <div style="text-align:center;margin-bottom:4rem" data-aos="fade-up">
-                    <div class="ds-label"><i class="fa-solid fa-heart-pulse"></i> Կրիտիկական Իրավիճակներ</div>
-                    <h2 class="ds-h2">Գործողությունների Պլան</h2>
-                    <p class="ds-sub" style="margin:0 auto">Երկու հիմնական սուր բարդությունները պահանջում են արագ և ճշգրիտ արձագանք:</p>
-                </div>
-
-                <div class="emergency-grid">
-                    <!-- HYPOGLYCEMIA -->
-                    <div class="glass-card em-card hypo" data-aos="fade-right">
-                        <div class="em-header">
-                            <div class="em-icon"><i class="fa-solid fa-arrow-trend-down"></i></div>
-                            <div>
-                                <h3 class="em-title">Հիպոգլիկեմիա</h3>
-                                <p class="em-subtitle">Արյան շաքարը < 3.9 մմոլ/լ</p>
-                            </div>
-                        </div>
-                        <div class="em-symptoms">
-                            <h4><i class="fa-solid fa-triangle-exclamation"></i> Ախտանիշներ</h4>
-                            <div class="sym-tags">
-                                <span class="sym-tag">Դող</span>
-                                <span class="sym-tag">Քրտնարտադրություն</span>
-                                <span class="sym-tag">Ուժեղ քաղց</span>
-                                <span class="sym-tag">Գլխապտույտ</span>
-                                <span class="sym-tag">Անհանգստություն</span>
-                            </div>
-                        </div>
-                        <div class="action-steps">
-                            <div class="step-item">
-                                <div class="step-num">1</div>
-                                <div class="step-content">
-                                    <strong>Չափեք շաքարը (եթե հնարավոր է)</strong>
-                                    <p>Անմիջապես ստուգեք գլյուկոզայի մակարդակը: Եթե սարք չկա, միևնույն է, գործեք որպես հիպոգլիկեմիա:</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">2</div>
-                                <div class="step-content">
-                                    <strong>15 գրամ արագ ածխաջուր</strong>
-                                    <p>Տվեք հիվանդին 1 ճաշի գդալ շաքարավազ ջրով, 150մլ քաղցր հյութ կամ 3-4 կտոր կոնֆետ (ոչ շոկոլադե):</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">3</div>
-                                <div class="step-content">
-                                    <strong>Սպասեք 15 րոպե և կրկին չափեք</strong>
-                                    <p>Եթե շաքարը դեռ ցածր է 3.9-ից, կրկնեք քայլ 2-ը: Եթե բարելավվել է, տվեք բարդ ածխաջուր (օր.՝ բուտերբրոդ):</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">!</div>
-                                <div class="step-content">
-                                    <strong>Գիտակցության կորուստ</strong>
-                                    <p>Եթե անձը անգիտակից է, ՈՉԻՆՉ մի դրեք նրա բերանում: Ներարկեք գլյուկագոն կամ անմիջապես զանգահարեք շտապօգնություն:</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- HYPERGLYCEMIA -->
-                    <div class="glass-card em-card hyper" data-aos="fade-left">
-                        <div class="em-header">
-                            <div class="em-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                            <div>
-                                <h3 class="em-title">Հիպերգլիկեմիա</h3>
-                                <p class="em-subtitle">Արյան շաքարը > 13.9 մմոլ/լ</p>
-                            </div>
-                        </div>
-                        <div class="em-symptoms">
-                            <h4><i class="fa-solid fa-triangle-exclamation"></i> Ախտանիշներ</h4>
-                            <div class="sym-tags">
-                                <span class="sym-tag">Ուժեղ ծարավ</span>
-                                <span class="sym-tag">Հաճախակի միզարձակում</span>
-                                <span class="sym-tag">Չոր բերան</span>
-                                <span class="sym-tag">Հոգնածություն</span>
-                                <span class="sym-tag">Ացետոնի հոտ (Կետոացիդոզ)</span>
-                            </div>
-                        </div>
-                        <div class="action-steps">
-                            <div class="step-item">
-                                <div class="step-num">1</div>
-                                <div class="step-content">
-                                    <strong>Խմեք շատ ջուր</strong>
-                                    <p>Օրգանիզմը ջրազրկվում է, երբ փորձում է մեզի միջոցով դուրս բերել ավելցուկային շաքարը:</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">2</div>
-                                <div class="step-content">
-                                    <strong>Ստուգեք կետոնները մեզում</strong>
-                                    <p>Եթե շաքարը բարձր է 13.9-ից հատկապես 1-ին տիպի դեպքում, օգտագործեք կետոնային թեստ-երիզներ:</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">3</div>
-                                <div class="step-content">
-                                    <strong>Ինսուլինի լրացուցիչ դոզա</strong>
-                                    <p>Ընդունեք կարճ ազդեցության ինսուլին՝ ըստ ձեր բժշկի նախապես կազմած գործողությունների պլանի:</p>
-                                </div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-num">!</div>
-                                <div class="step-content">
-                                    <strong>Կետոացիդոզի վտանգ</strong>
-                                    <p>Եթե առկա է սրտխառնոց, փսխում, շնչարգելություն կամ մեզում կան շատ կետոններ՝ ԱՆՀԱՊԱՂ դիմեք հիվանդանոց:</p>
-                                </div>
-                            </div>
-                        </div>
+        <div class="em-grid">
+            
+            <!-- Hypoglycemia Card -->
+            <div class="em-card em-hypo">
+                <div class="em-header">
+                    <div class="em-icon"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div>
+                        <h2 class="em-title">Հիպոգլիկեմիա</h2>
+                        <div class="em-subtitle">&lt; 3.9 մմոլ/լ (Ցածր Շաքար)</div>
                     </div>
                 </div>
-            </section>
-        </div>
+                <div class="em-body">
+                    <div class="em-section-title"><i class="fa-solid fa-triangle-exclamation" style="color:#5bc0eb;"></i> Ախտանիշները</div>
+                    <div class="sym-tags">
+                        <span class="sym-tag">Դող և քրտնարտադրություն</span>
+                        <span class="sym-tag">Անհագ սով</span>
+                        <span class="sym-tag">Գլխապտույտ</span>
+                        <span class="sym-tag">Ագրեսիվություն</span>
+                    </div>
 
-        <footer><p>© 2026 DiaBalance — <a href="index.html">Գլխավոր Էջ</a></p></footer>
+                    <div class="em-section-title"><i class="fa-solid fa-stopwatch" style="color:#5bc0eb;"></i> Գործողություններ («15-ի Կանոն»)</div>
+                    <ul class="action-list">
+                        <li>Տվեք <strong>15 գրամ արագ ածխաջուր</strong>: Օրինակ՝ 1 ճաշի գդալ շաքարավազ լուծված ջրում, կես բաժակ քաղցր հյութ, կամ 3-4 կտոր կոնֆետ (ոչ շոկոլադ):</li>
+                        <li>Սպասեք ուղիղ <strong>15 րոպե</strong> և նորից չափեք շաքարը:</li>
+                        <li>Եթե արդյունքը դեռ ցածր է 3.9-ից, կրկնեք Քայլ 1-ը: Եթե բարձրացել է, տվեք բարդ ածխաջուր (օրինակ՝ հաց), որպեսզի նորից չիջնի:</li>
+                    </ul>
+
+                    <div class="alert-callout">
+                        <i class="fa-solid fa-ban"></i>
+                        <div><strong>ԿՐԻՏԻԿԱԿԱՆ Է:</strong> Եթե անձը կորցրել է գիտակցությունը, ՈՉԻՆՉ մի դրեք նրա բերանում (խեղդվելու վտանգ): Անմիջապես զանգահարեք 1-03 կամ ներարկեք Գլյուկագոն:</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hyperglycemia Card -->
+            <div class="em-card em-hyper">
+                <div class="em-header">
+                    <div class="em-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div>
+                        <h2 class="em-title">Հիպերգլիկեմիա</h2>
+                        <div class="em-subtitle">&gt; 13.9 մմոլ/լ (Բարձր Շաքար)</div>
+                    </div>
+                </div>
+                <div class="em-body">
+                    <div class="em-section-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--red);"></i> Ախտանիշները</div>
+                    <div class="sym-tags">
+                        <span class="sym-tag">Ուժեղ ծարավ</span>
+                        <span class="sym-tag">Հաճախակի միզարձակում</span>
+                        <span class="sym-tag">Ացետոնի հոտ բերանից</span>
+                        <span class="sym-tag">Խորը շնչառություն</span>
+                    </div>
+
+                    <div class="em-section-title"><i class="fa-solid fa-kit-medical" style="color:var(--red);"></i> Գործողություններ</div>
+                    <ul class="action-list">
+                        <li><strong>Շատ հեղուկներ:</strong> Խմեք մաքուր ջուր (առանց շաքարի)՝ օրգանիզմից մեզի միջոցով ավելցուկային շաքարը հեռացնելու և ջրազրկումը կանխելու համար:</li>
+                        <li><strong>Ինսուլինի ներարկում:</strong> Արեք կարճ ազդեցության ինսուլինի ուղղիչ (կորեկցիոն) դոզա՝ ըստ ձեր բժշկի կազմած պլանի:</li>
+                        <li><strong>Ստուգեք կետոնները:</strong> Տիպ 1 դիաբետի դեպքում անպայման ստուգեք կետոնները մեզում հատուկ թեստ-երիզներով:</li>
+                    </ul>
+
+                    <div class="alert-callout">
+                        <i class="fa-solid fa-truck-medical"></i>
+                        <div><strong>ԿՐԻՏԻԿԱԿԱՆ Է:</strong> Եթե առկա է սրտխառնոց, փսխում, կամ մեզում կետոնները բարձր են, անհապաղ դիմեք հիվանդանոց: Դա կետոացիդոզի նշան է:</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script>
-        AOS.init({ once: true, easing: 'ease-out-cubic', offset: 80 });
-
-        // THREE JS background
-        (function() {
-            const canvas = document.getElementById('bg-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
-            camera.position.z = 38;
-            scene.fog = new THREE.FogExp2(0xf5f6fa, 0.022);
-
-            const TEAL = new THREE.Color(0x0cbfb0);
-            const BLUE = new THREE.Color(0x1a3c6e);
-            const RED = new THREE.Color(0xe05252);
-            const N = 40, SP = 22, pos = [], meshes = [], vel = [];
-            const sg = new THREE.SphereGeometry(1, 12, 12);
-
-            for (let i = 0; i < N; i++) {
-                const p = new THREE.Vector3((Math.random() - .5) * SP * 2, (Math.random() - .5) * SP * 1.3, (Math.random() - .5) * SP * 0.7);
-                pos.push(p);
-                const c = Math.random() < 0.4 ? TEAL : Math.random() < 0.8 ? BLUE : RED;
-                const m = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.3 }));
-                m.scale.setScalar(0.08 + Math.random() * 0.2);
-                m.position.copy(p);
-                scene.add(m);
-                meshes.push(m);
-                vel.push(new THREE.Vector3((Math.random() - .5) * 0.01, (Math.random() - .5) * 0.01, (Math.random() - .5) * 0.005));
-            }
-
-            const lg = new THREE.BufferGeometry(), max = N * (N - 1) / 2, lp = new Float32Array(max * 2 * 3);
-            lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
-            const lm = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x0cbfb0, transparent: true, opacity: 0.08 }));
-            scene.add(lm);
-
-            const mouse = new THREE.Vector2(0, 0);
-            window.addEventListener('mousemove', e => {
-                mouse.x = (e.clientX / window.innerWidth - .5) * 2;
-                mouse.y = (e.clientY / window.innerHeight - .5) * 2;
-            });
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-                camera.position.x += (mouse.x * 2 - camera.position.x) * 0.03;
-                camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.03;
-                camera.lookAt(scene.position);
-
-                let idx = 0;
-                for (let i = 0; i < N; i++) {
-                    const p = pos[i], v = vel[i];
-                    p.add(v);
-                    if (Math.abs(p.x) > SP) v.x *= -1;
-                    if (Math.abs(p.y) > SP * 0.7) v.y *= -1;
-                    if (Math.abs(p.z) > SP * 0.4) v.z *= -1;
-                    meshes[i].position.copy(p);
-                }
-                
-                for (let a = 0; a < N; a++) {
-                    for (let b = a + 1; b < N; b++) {
-                        if (pos[a].distanceTo(pos[b]) < 8) {
-                            lp[idx++] = pos[a].x; lp[idx++] = pos[a].y; lp[idx++] = pos[a].z;
-                            lp[idx++] = pos[b].x; lp[idx++] = pos[b].y; lp[idx++] = pos[b].z;
-                        }
-                    }
-                }
-                lg.attributes.position.needsUpdate = true;
-                lg.setDrawRange(0, idx / 3);
-                renderer.render(scene, camera);
-            }
-            animate();
-        })();
-    </script>
+    <script src="mobile-nav.js"></script>
 </body>
 </html>
